@@ -8,6 +8,7 @@
 #include "utils.cpp"
 
 const std::string output_file = "result.ppm";
+const RGB backgroundColor = RGB(114, 237, 237);
 const int width = 1920;
 const int height = 1080;
 
@@ -35,10 +36,7 @@ int main (int argc, char **argv) {
 
     for (int i = 0; i < height; i++) {
         for (int j = 0; j < width; j++) {
-            int r = randrange(0, 255);
-            int g = randrange(0, 255);
-            int b = randrange(0, 255);
-            arr[i][j] = RGB(r, g, b);
+            arr[i][j] = backgroundColor;
         }
     }
 
