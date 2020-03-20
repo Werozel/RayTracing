@@ -17,13 +17,13 @@ class Vector {
         Vector(const Vector &v): x{v.x}, y{v.y}, z{v.z} {}
 
         virtual void operator= (const Vector &v) { x = v.x; y = v.y; z = v.z;}
-        inline bool operator== (const Vector &v) { return (x==v.x && y==v.y && z==v.z);}
+        inline bool operator== (const Vector &v) const { return (x==v.x && y==v.y && z==v.z);}
 
-        Vector operator+ (const Vector &v) { return Vector(x + v.x, y + v.y, z + v.z);}
-        Vector operator- (const Vector &v) { return Vector(x - v.x, y - v.y, z - v.z);}
-        Vector operator-() { return Vector(-x, -y, -z);}
-        Vector operator* (const Vector &v) { return Vector(x * v.x, y * v.y, z * v.z);}
-        Vector operator* (const float &n) { return Vector(x * n, y * n, z * n);}
+        Vector operator+ (const Vector &v) const { return Vector(x + v.x, y + v.y, z + v.z);}
+        Vector operator- (const Vector &v) const { return Vector(x - v.x, y - v.y, z - v.z);}
+        Vector operator-() const { return Vector(-x, -y, -z);}
+        Vector operator* (const Vector &v) const { return Vector(x * v.x, y * v.y, z * v.z);}
+        Vector operator* (const float &n) const { return Vector(x * n, y * n, z * n);}
         friend Vector operator* (const float &n, const Vector &v) { return Vector(n * v.x, n * v.y, n * v.z);}
         friend std::ostream & operator<< (std::ostream &out, const Vector &v) { return out << v.x << ", " << v.y << ", " << v.z;}
 };
@@ -40,6 +40,8 @@ class RGB: public Vector {
         RGB(const Vector &v): Vector(v), r(x), g(y), b(z) {}
 
         void operator= (const Vector &v) { x = v.x; r = v.x; y = v.y; g = v.y; z = v.z; b = v.z;}
+
+        friend std::ostream & operator<< (std::ostream &out, const RGB &v) { return out << v.r << " " << v.g << " " << v.b;}
 };
 
 
