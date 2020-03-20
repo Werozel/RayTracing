@@ -3,13 +3,10 @@
 #include <string>
 
 const std::string output_file = "result.ppm";
+const int width = 1080;
+const int height = 1920;
 
 void render() {
-
-    const int width = 1080;
-    const int height = 1920;
-
-    
 
 }
 
