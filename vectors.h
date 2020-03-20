@@ -48,5 +48,4 @@ class RGB: public Vector {
         friend std::ostream & operator<< (std::ostream &out, const RGB &v) { return out << (char)v.r << (char)v.g << (char)v.b;}
 };
 
-
 #endif

@@ -29,7 +29,6 @@ void render (const std::vector<std::vector<RGB> > &arr, const int &w = width, co
 
 
 int main (int argc, char **argv) {
-    
     srand(time(NULL));
 
     std::vector<std::vector<RGB> > arr(height, std::vector<RGB>(width));
