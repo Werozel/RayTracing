@@ -1,5 +1,7 @@
+CC = g++
+
 all:
-	g++ main.cpp -o main
+	g++ main.cpp -o rt
 
 clean:
-	rm main
+	rm rt
