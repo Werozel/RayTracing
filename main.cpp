@@ -3,6 +3,7 @@
 #include <vector>
 #include <string>
 #include <time.h>
+#include <chrono>
 #include "vectors.h"
 #include "utils.cpp"
 
@@ -18,7 +19,7 @@ void render (const std::vector<std::vector<RGB> > &arr, const int &w = width, co
     out << "P6\n" << w << " " << h << "\n255\n";
     for (int i = 0; i < h; i++) {
         for (int j = 0; j < w; j++) {
-            out << arr[i][j] << std::endl;
+            out << arr[i][j];
         }
     }
 
