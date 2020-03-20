@@ -39,7 +39,7 @@ int main (int argc, char **argv) {
         }
     }
 
-    render(arr);
+    //render(arr);
 
-    return 1;
+    return 0;
 }
