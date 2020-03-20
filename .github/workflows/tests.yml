@@ -9,12 +9,14 @@ jobs:
 
     runs-on: ubuntu-latest
     
-    steps:
+    steps:  
     - uses: actions/checkout@v2
-    - name: make
+    - name: Make
       run: make
-    - name: run
+    - name: Run
       run: ./rt
-    - name: make check
+    - name: Check
       run: make check
+    - name: Clean
+      run: make clean
       
