@@ -41,5 +41,5 @@ int main (int argc, char **argv) {
 
     render(arr);
 
-    return 0;
+    return 1;
 }
