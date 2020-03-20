@@ -1,8 +1,6 @@
 #ifndef __VECTORS_H__
 #define __VECTORS_H__
 
-#include <cmath>
-#include <vector>
 #include <iostream>
 
 class Vector {
@@ -11,8 +9,7 @@ class Vector {
         float y;
         float z;
 
-        Vector(): x(0.f), y(0.f), z(0.f) {}
-        Vector(const float &n): x(n), y(n), z(n) {}
+        Vector(const float &n = 0.f): x(n), y(n), z(n) {}
         Vector(const float &tx, const float &ty, const float &tz): x(tx), y(ty), z(tz) {}
         Vector(const Vector &v): x{v.x}, y{v.y}, z{v.z} {}
 
@@ -28,14 +25,21 @@ class Vector {
         friend std::ostream & operator<< (std::ostream &out, const Vector &v) { return out << v.x << ", " << v.y << ", " << v.z;}
 };
 
+class Point: public Vector {
+    public:
+        Point(const float &n = 0.f): Vector(n) {}
+        Point(const float &tx, const float &ty, const float &tz): Vector(tx, ty, tz) {}
+        Point(const Vector &v): Vector(v) {}
+
+};
+
 class RGB: public Vector {
     public:
         float r;
         float g;
         float b;
 
-        RGB(): Vector(), r(x), g(y), b(z) {}
-        RGB(const float &n): Vector(n), r(x), g(y), b(z) {}
+        RGB(const float &n = 0.f): Vector(n), r(x), g(y), b(z) {}
         RGB(const float &tr, const float &tg, const float &tb): Vector(tr, tg, tb), r(x), g(y), b(z) {}
         RGB(const Vector &v): Vector(v), r(x), g(y), b(z) {}
 

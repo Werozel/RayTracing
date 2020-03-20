@@ -5,3 +5,4 @@ all:
 
 clean:
 	rm rt
+	rm result.*

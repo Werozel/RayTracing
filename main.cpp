@@ -7,17 +7,15 @@
 #include "utils.cpp"
 
 const std::string output_file = "result.ppm";
-const int width = 1080;
-const int height = 1920;
+const int width = 1920;
+const int height = 1080;
 
-void render(const std::vector<std::vector<RGB> > &arr, const int &w = width, const int &h = height) {
+void render (const std::vector<std::vector<RGB> > &arr, const int &w = width, const int &h = height) {
 
     std::ofstream out;
     out.open(output_file);
 
     out << "P6\n" << w << " " << h << "\n255\n";
-    std::cout << "file created" << std::endl;
-    printf("w = %d, h = %d\n", w, h);
     for (int i = 0; i < h; i++) {
         for (int j = 0; j < w; j++) {
             out << arr[i][j] << std::endl;
@@ -32,10 +30,10 @@ int main (int argc, char **argv) {
     
     srand(time(NULL));
 
-    std::vector<std::vector<RGB> > arr(2, std::vector<RGB>(3));
+    std::vector<std::vector<RGB> > arr(height, std::vector<RGB>(width));
 
-    for (int i = 0; i < 2; i++) {
-        for (int j = 0; j < 3; j++) {
+    for (int i = 0; i < height; i++) {
+        for (int j = 0; j < width; j++) {
             int r = randrange(0, 255);
             int g = randrange(0, 255);
             int b = randrange(0, 255);
@@ -43,8 +41,7 @@ int main (int argc, char **argv) {
         }
     }
 
-    std::cout << "rendering" << std::endl;
-    render(arr, 3, 2);
+    render(arr);
 
     return 0;
 }
