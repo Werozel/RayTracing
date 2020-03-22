@@ -4,6 +4,7 @@
 #include <iostream>
 #include <cmath>
 #include "vectors.cpp"
+#include "objects.h"
 
 
 float distance(const Point &p1, const Point &p2);
@@ -18,6 +19,10 @@ class Triplet {
         Triplet(const float &n = 0.f): x(n), y(n), z(n) {}
         Triplet(const float &tx, const float &ty, const float &tz): x(tx), y(ty), z(tz) {}
         Triplet(const Triplet &t): x(t.x), y(t.y), z(t.z) {}
+
+        float get_x() const {return x;}
+        float get_y() const {return y;}
+        float get_z() const {return z;}
 
         virtual void operator= (const Triplet &v) { x = v.x; y = v.y; z = v.z;}
         inline bool operator== (const Triplet &v) const { return (x==v.x && y==v.y && z==v.z);}
@@ -68,6 +73,10 @@ class RGB: public Triplet {
         RGB(const float &n = 0.f): Triplet(n), r(x), g(y), b(z) {}
         RGB(const float &tr, const float &tg, const float &tb): Triplet(tr, tg, tb), r(x), g(y), b(z) {}
         RGB(const Triplet &v): Triplet(v), r(x), g(y), b(z) {}
+
+        float get_r() {return r;}
+        float get_g() {return g;}
+        float get_b() {return b;}
 
         void operator= (const Triplet &v) { x = v.x; r = v.x; y = v.y; g = v.y; z = v.z; b = v.z;}
 

@@ -16,7 +16,7 @@ class Object {
 
         Object(const RGB &col, const Point &pos, const SurfaceType &stype): color(col), position(pos), surfaceType(stype) {}
 
-        bool ray_intersection(const Ray &ray) {
+        bool ray_intersection(const Ray &ray) const {
             return false;
         }
 
@@ -31,7 +31,7 @@ class Sphere: public Object {
 
         void operator= (const Sphere &s) { radius = s.radius;}
 
-        bool ray_intesection(const Ray &ray) {
+        bool ray_intesection(const Ray &ray) const {
             float dist = ray.distance_to_object(*this);
             return dist <= radius;
         }

@@ -1,4 +1,5 @@
 #include "vectors.h"
+#include "objects.h"
 
 
 float distance(const Point &p1, const Point &p2) {

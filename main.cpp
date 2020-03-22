@@ -56,7 +56,7 @@ int main (int argc, char **argv) {
     srand(time(NULL));
 
     std::vector<Object> objects;
-    objects.push_back(Sphere(20, RGB(64, 247, 39), Point(200, 100, 10), OPAQUE));
+    objects.push_back(Sphere(20.f, RGB(64, 247, 39), Point(200, 100, 10), OPAQUE));
 
     render(objects);
 
