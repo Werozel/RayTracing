@@ -2,8 +2,13 @@
 #define __OBJECTS_H__
 
 #include <iostream>
-#include "vectors.h"
-#include "vectors.cpp"
+
+class Triplet;
+class RGB;
+class Point;
+class Vector;
+class Ray;
+
 
 enum SurfaceType { OPAQUE, MIRROR, TRANSPARENT};
 enum IntersectionType { ABSORPTION, REFLECTION, REFLECTION_AND_REFRACTION};

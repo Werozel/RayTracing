@@ -8,6 +8,7 @@
 #include "utils.cpp"
 #include "objects.h"
 
+
 const std::string output_file = "result.ppm";
 const RGB backgroundColor = RGB(114, 237, 237);
 const int width = 1920;

@@ -4,7 +4,12 @@
 #include <iostream>
 #include <cmath>
 #include "vectors.cpp"
-#include "objects.h"
+
+
+class Object;
+class Sphere;
+class Parallelepiped;
+class Ray;
 
 
 float distance(const Point &p1, const Point &p2);
