@@ -31,7 +31,7 @@ class Sphere: public Object {
 
         void operator= (const Sphere &s) { radius = s.radius;}
 
-        bool ray_intesection(const Ray &ray) const {
+        bool ray_intesection(const Ray &ray) const{
             float dist = ray.distance_to_object(*this);
             return dist <= radius;
         }
