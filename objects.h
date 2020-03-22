@@ -3,6 +3,7 @@
 
 #include <iostream>
 #include "vectors.h"
+#include "vectors.cpp"
 
 enum SurfaceType { OPAQUE, MIRROR, TRANSPARENT};
 enum IntersectionType { ABSORPTION, REFLECTION, REFLECTION_AND_REFRACTION};
@@ -46,9 +47,18 @@ class Ray {
         Point start;
         Vector direction;
 
-    float distance (const Point &p) {
+    float distance_to_point (const Point &p) {
+        Vector v = Vector(start, p).normalize();
+        float cos = v * direction;
+        if (cos <= 0) {
+            return distance(start, p);
+        } else {
+            return distance(p, start + (v * direction)/direction.get_length() * direction.normalize());
+        }
+    }
 
-        return 0.0;
+    float distance_to_object (const Object &o) {
+        return distance_to_point(o.position);
     }
         
 };

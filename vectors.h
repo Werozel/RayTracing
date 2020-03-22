@@ -3,6 +3,11 @@
 
 #include <iostream>
 #include <cmath>
+#include "vectors.cpp"
+
+
+float distance(const Point &p1, const Point &p2);
+
 
 class Triplet {
     public:
@@ -12,7 +17,7 @@ class Triplet {
 
         Triplet(const float &n = 0.f): x(n), y(n), z(n) {}
         Triplet(const float &tx, const float &ty, const float &tz): x(tx), y(ty), z(tz) {}
-        Triplet(const Triplet &t): x{t.x}, y{t.y}, z{t.z} {}
+        Triplet(const Triplet &t): x(t.x), y(t.y), z(t.z) {}
 
         virtual void operator= (const Triplet &v) { x = v.x; y = v.y; z = v.z;}
         inline bool operator== (const Triplet &v) const { return (x==v.x && y==v.y && z==v.z);}
@@ -20,7 +25,7 @@ class Triplet {
         Triplet operator+ (const Triplet &v) const { return Triplet(x + v.x, y + v.y, z + v.z);}
         Triplet operator- (const Triplet &v) const { return Triplet(x - v.x, y - v.y, z - v.z);}
         Triplet operator-() const { return Triplet(-x, -y, -z);}
-        Triplet operator* (const Triplet &v) const { return Triplet(x * v.x, y * v.y, z * v.z);}
+        float operator* (const Triplet &v) const { return x * v.x + y * v.y + z * v.z;}
         Triplet operator* (const float &n) const { return Triplet(x * n, y * n, z * n);}
         friend Triplet operator* (const float &n, const Triplet &v) { return Triplet(n * v.x, n * v.y, n * v.z);}
         friend std::ostream & operator<< (std::ostream &out, const Triplet &v) { return out << v.x << ", " << v.y << ", " << v.z;}
@@ -34,17 +39,16 @@ class Vector: public Triplet {
 
         Vector(const float &n = 0.f): x(n), y(n), z(n) {}
         Vector(const float &tx, const float &ty, const float &tz): x(tx), y(ty), z(tz) {}
-        Vector(const Vector &v): x{v.x}, y{v.y}, z{v.z} {}
+        Vector(const Vector &v): x(v.x), y(v.y), z(v.z) {}
+        Vector(const Point &from, const Point &to): x(to.x - from.x), y(to.y - from.y), z(to.z - from.z) {}
 
         float get_length() {
             return x * x + y * y + z * z;
         }
 
-        void normalize(const float &k = 1) {
+        Vector normalize() {
             float l = get_length();
-            x = x / l * k;
-            y = y / l * k;
-            z = z / l * k;
+            return Vector(x / l, y / l, z / l);
         }
 };
 
@@ -54,7 +58,7 @@ class Point: public Triplet {
         Point(const float &tx, const float &ty, const float &tz): Triplet(tx, ty, tz) {}
         Point(const Triplet &v): Triplet(v) {}
 
-
+    static 
 };
 
 class RGB: public Triplet {
@@ -71,9 +75,6 @@ class RGB: public Triplet {
 
         friend std::ostream & operator<< (std::ostream &out, const RGB &v) { return out << (char)v.r << (char)v.g << (char)v.b;}
 };
-
-
-float distance(const Point &p1, const Point &p2);
 
 
 #endif
