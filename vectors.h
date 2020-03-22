@@ -2,6 +2,7 @@
 #define __VECTORS_H__
 
 #include <iostream>
+#include <cmath>
 
 class Vector {
     public:
@@ -23,6 +24,17 @@ class Vector {
         Vector operator* (const float &n) const { return Vector(x * n, y * n, z * n);}
         friend Vector operator* (const float &n, const Vector &v) { return Vector(n * v.x, n * v.y, n * v.z);}
         friend std::ostream & operator<< (std::ostream &out, const Vector &v) { return out << v.x << ", " << v.y << ", " << v.z;}
+
+        float get_length() {
+            return x * x + y * y + z * z;
+        }
+
+        void normalize(const float &k = 1) {
+            float l = get_length();
+            x = x / l * k;
+            y = y / l * k;
+            z = z / l * k;
+        }
 };
 
 class Point: public Vector {

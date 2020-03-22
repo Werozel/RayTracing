@@ -12,6 +12,7 @@ const RGB backgroundColor = RGB(114, 237, 237);
 const int width = 1920;
 const int height = 1080;
 
+
 void render (const std::vector<std::vector<RGB> > &arr, const int &w = width, const int &h = height) {
 
     std::ofstream out;
