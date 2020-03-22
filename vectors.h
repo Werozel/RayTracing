@@ -42,11 +42,11 @@ class Vector: public Triplet {
         Vector(const Vector &v): x(v.x), y(v.y), z(v.z) {}
         Vector(const Point &from, const Point &to): x(to.x - from.x), y(to.y - from.y), z(to.z - from.z) {}
 
-        float get_length() {
+        float get_length() const {
             return x * x + y * y + z * z;
         }
 
-        Vector normalize() {
+        Vector normalize() const {
             float l = get_length();
             return Vector(x / l, y / l, z / l);
         }
@@ -56,9 +56,7 @@ class Point: public Triplet {
     public:
         Point(const float &n = 0.f): Triplet(n) {}
         Point(const float &tx, const float &ty, const float &tz): Triplet(tx, ty, tz) {}
-        Point(const Triplet &v): Triplet(v) {}
-
-    static 
+        Point(const Triplet &v): Triplet(v) {} 
 };
 
 class RGB: public Triplet {
