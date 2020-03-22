@@ -5,6 +5,7 @@
 #include "vectors.h"
 
 enum SurfaceType { OPAQUE, MIRROR, TRANSPARENT};
+enum IntersectionType { ABSORPTION, REFLECTION, REFLECTION_AND_REFRACTION};
 
 class Object {
     public:
@@ -37,6 +38,19 @@ class Parallelepiped: public Object {
         Parallelepiped (const Parallelepiped &p): Object(), a(p.a), b(p.b), c(p.c) {}
 
         void operator= (const Parallelepiped &p) { a = p.a; b = p.b; c = p.c;}
+};
+
+
+class Ray {
+    public:
+        Point start;
+        Vector direction;
+
+    float distance (const Point &p) {
+
+        return 0.0;
+    }
+        
 };
 
 #endif
