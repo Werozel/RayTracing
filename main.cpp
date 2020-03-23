@@ -5,7 +5,6 @@
 #include <time.h>
 #include <chrono>
 #include "vectors.h"
-#include "utils.cpp"
 #include "objects.h"
 
 
@@ -18,7 +17,7 @@ const float view_angle = 90;
 
 RGB cast_ray(const Ray &ray, const std::vector<Object> &objects) {
     for (Object obj: objects) {
-        if (obj.ray_intersection(ray)) return obj.color;
+        if (obj.ray_intersection(ray)) return *obj.color;
     }
     return backgroundColor;
 }

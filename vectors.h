@@ -1,14 +1,17 @@
-#ifndef __VECTORS_H__
-#define __VECTORS_H__
+#ifndef VECTORS_H
+#define VECTORS_H
 
 #include <iostream>
 #include <cmath>
-#include "vectors.cpp"
 
 
 class Object;
 class Sphere;
 class Parallelepiped;
+class Point;
+class Vector;
+class Triplet;
+class RGB;
 class Ray;
 
 
@@ -23,22 +26,21 @@ class Triplet {
 
         Triplet(const float &n = 0.f): x(n), y(n), z(n) {}
         Triplet(const float &tx, const float &ty, const float &tz): x(tx), y(ty), z(tz) {}
-        Triplet(const Triplet &t): x(t.x), y(t.y), z(t.z) {}
+        Triplet(const Triplet &t);
 
-        float get_x() const {return x;}
-        float get_y() const {return y;}
-        float get_z() const {return z;}
+        float get_x() const;
+        float get_y() const;
+        float get_z() const;
 
-        virtual void operator= (const Triplet &v) { x = v.x; y = v.y; z = v.z;}
-        inline bool operator== (const Triplet &v) const { return (x==v.x && y==v.y && z==v.z);}
+        virtual void operator= (const Triplet &t);
+        inline bool operator== (const Triplet &v) const;
 
-        Triplet operator+ (const Triplet &v) const { return Triplet(x + v.x, y + v.y, z + v.z);}
-        Triplet operator- (const Triplet &v) const { return Triplet(x - v.x, y - v.y, z - v.z);}
-        Triplet operator-() const { return Triplet(-x, -y, -z);}
-        float operator* (const Triplet &v) const { return x * v.x + y * v.y + z * v.z;}
-        Triplet operator* (const float &n) const { return Triplet(x * n, y * n, z * n);}
-        friend Triplet operator* (const float &n, const Triplet &v) { return Triplet(n * v.x, n * v.y, n * v.z);}
-        friend std::ostream & operator<< (std::ostream &out, const Triplet &v) { return out << v.x << ", " << v.y << ", " << v.z;}
+        Triplet operator+ (const Triplet &v) const;
+        Triplet operator- (const Triplet &v) const;
+        Triplet operator-() const;
+        float operator* (const Triplet &v) const;
+        Triplet operator* (const float &n) const;
+        friend Triplet operator* (const float &n, const Triplet &t) {return Triplet(n * t.get_x(), n * t.get_y(), n * t.get_z());}
 };
 
 class Vector: public Triplet {
@@ -49,17 +51,12 @@ class Vector: public Triplet {
 
         Vector(const float &n = 0.f): x(n), y(n), z(n) {}
         Vector(const float &tx, const float &ty, const float &tz): x(tx), y(ty), z(tz) {}
-        Vector(const Vector &v): x(v.x), y(v.y), z(v.z) {}
-        Vector(const Point &from, const Point &to): x(to.x - from.x), y(to.y - from.y), z(to.z - from.z) {}
+        Vector(const Vector &v);
+        Vector(const Point &from, const Point &to);
 
-        float get_length() const {
-            return x * x + y * y + z * z;
-        }
+        float get_length() const;
 
-        Vector normalize() const {
-            float l = get_length();
-            return Vector(x / l, y / l, z / l);
-        }
+        Vector normalize() const;
 };
 
 class Point: public Triplet {
@@ -79,13 +76,13 @@ class RGB: public Triplet {
         RGB(const float &tr, const float &tg, const float &tb): Triplet(tr, tg, tb), r(x), g(y), b(z) {}
         RGB(const Triplet &v): Triplet(v), r(x), g(y), b(z) {}
 
-        float get_r() {return r;}
-        float get_g() {return g;}
-        float get_b() {return b;}
+        float get_r() const;
+        float get_g() const;
+        float get_b() const;
 
-        void operator= (const Triplet &v) { x = v.x; r = v.x; y = v.y; g = v.y; z = v.z; b = v.z;}
+        void operator= (const Triplet &v);
 
-        friend std::ostream & operator<< (std::ostream &out, const RGB &v) { return out << (char)v.r << (char)v.g << (char)v.b;}
+        friend std::ostream & operator<< (std::ostream &out, const RGB &v) { return out << (char)v.get_r() << (char)v.get_g() << (char)v.get_b();}
 };
 
 

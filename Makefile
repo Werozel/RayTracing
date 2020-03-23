@@ -1,7 +1,7 @@
 CC = g++
 
 all:
-	g++ main.cpp -o rt
+	g++ main.cpp vectors.cpp objects.cpp -o rt
 
 check:
 	test -r result.ppm && echo "Result generated" || (echo "Result not generated!" & exit 1)
