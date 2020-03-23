@@ -4,15 +4,15 @@
 
 Object::Object(const RGB &col, const Point &pos, const SurfaceType &stype): surfaceType(stype) {color = new RGB(col); position = new Point(pos);}
 
-bool Object::ray_intersection(const Ray &ray) const {
-    return false;
-}
-
 RGB Object::get_color() const { return *color;}
 Point Object::get_position() const { return *position;}
 SurfaceType Object::get_stype() const { return surfaceType;}
 
 Object::~Object () {delete color; delete position;}
+
+bool Object::ray_intersection(const Ray &ray) const {
+    return false;
+}
 
 
 Sphere::Sphere (const Sphere &s): Object(s.get_color(), s.get_position(), s.get_stype()), radius(s.get_radius()) {}
@@ -20,9 +20,9 @@ void Sphere::operator= (const Sphere &s) { radius = s.get_radius();}
 
 float Sphere::get_radius () const { return radius;}
 
-bool Sphere::ray_intesection(const Ray &ray) const {
-            float dist = ray.distance_to_object(*this);
-            return dist <= radius;
+bool Sphere::ray_intersection(const Ray &ray) const {
+    float dist = ray.distance_to_object(*this);
+    return dist <= radius;
 }
 
 
@@ -51,4 +51,7 @@ float Ray::distance_to_object (const Object &o) const {
     return distance_to_point(o.get_position());
 }
 
-Ray::~Ray () { delete start; delete direction;}
+Ray::~Ray () {
+    delete start;
+    delete direction;
+}

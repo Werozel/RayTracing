@@ -28,9 +28,9 @@ class Object {
         Point get_position() const;
         SurfaceType get_stype() const;
 
-        bool ray_intersection(const Ray &ray) const;
+        virtual bool ray_intersection(const Ray &ray) const;
 
-        ~Object ();
+        virtual ~Object ();
 };
 
 class Sphere: public Object {
@@ -46,7 +46,7 @@ class Sphere: public Object {
 
         void operator= (const Sphere &s);
 
-        bool ray_intesection(const Ray &ray) const;
+        virtual bool ray_intersection(const Ray &ray) const;
 };
 
 class Parallelepiped: public Object {
@@ -62,6 +62,8 @@ class Parallelepiped: public Object {
                         const RGB &col, const Point &pos, const SurfaceType &surf_type): 
             Object(col, pos, surf_type), a(ta), b(tb), c(tc) {}
         Parallelepiped (const Parallelepiped &p);
+
+        virtual bool ray_intesection(const Ray &ray) const = 0;
         
         float get_a() const;
         float get_b() const;

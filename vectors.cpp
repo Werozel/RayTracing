@@ -26,8 +26,8 @@ float Triplet::operator* (const Triplet &v) const { return x * v.get_x() + y * v
 Triplet Triplet::operator* (const float &n) const { return Triplet(x * n, y * n, z * n);}
 
 
-Vector::Vector(const Point &from, const Point &to): x(to.get_x() - from.get_x()), y(to.get_y() - from.get_y()), z(to.get_z() - from.get_z()) {}
-Vector::Vector(const Vector &v): x(v.get_x()), y(v.get_y()), z(v.get_z()) {}
+Vector::Vector(const Point &from, const Point &to): Triplet(to.get_x() - from.get_x(), to.get_y() - from.get_y(),to.get_z() - from.get_z()) {}
+Vector::Vector(const Triplet &v): Triplet(v) {}
 
 
 float Vector::get_length() const {

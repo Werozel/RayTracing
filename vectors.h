@@ -45,13 +45,10 @@ class Triplet {
 
 class Vector: public Triplet {
     public:
-        float x;
-        float y;
-        float z;
 
-        Vector(const float &n = 0.f): x(n), y(n), z(n) {}
-        Vector(const float &tx, const float &ty, const float &tz): x(tx), y(ty), z(tz) {}
-        Vector(const Vector &v);
+        Vector(const float &n = 0.f): Triplet(n) {}
+        Vector(const float &tx, const float &ty, const float &tz): Triplet(tx, ty, tz) {}
+        Vector(const Triplet &v);
         Vector(const Point &from, const Point &to);
 
         float get_length() const;
