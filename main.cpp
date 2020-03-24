@@ -12,7 +12,7 @@ const std::string output_file = "result.ppm";
 const RGB backgroundColor = RGB(114, 237, 237);
 const int width = 1920;
 const int height = 1080;
-const float view_angle = 90;
+const float fov = 90;
 
 
 RGB cast_ray(const Ray &ray, const std::vector<Sphere> &objects) {
@@ -30,11 +30,11 @@ void render (const std::vector<Sphere> &objects, const int &w = width, const int
     std::vector<std::vector<RGB> > pix(h, std::vector<RGB>(w));
     for (int i = 0; i < h; i++) {
         for (int j = 0; j < w; j++) {
-            float fw = (float)w;
-            float fh = (float)h;
-            float x =  (2*(i + 0.5)/fw - 1)*tan(view_angle/2.)*w/fh;
-            float y = -(2*(j + 0.5)/fh - 1)*tan(view_angle/2.);
-            Vector direction = Vector(x, y, -1).normalize();
+            if (j == 960 && i == 540) {
+                std::cout << std::endl;
+            }
+            Vector direction = Vector(j, i, 1).normalize();
+            // printf("W = %d, H = %d\nX = %.4f, Y = %.4f, Z = %.4f\n", j, i, direction.get_x(), direction.get_y(), direction.get_z());
             Ray ray = Ray(Point(0, 0, 0), direction);
             pix[i][j] = cast_ray(ray, objects);
         }

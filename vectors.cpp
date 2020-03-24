@@ -1,5 +1,6 @@
 #include "vectors.h"
 #include "objects.h"
+#include <cmath>
 
 
 float distance(const Point &p1, const Point &p2) {
@@ -31,7 +32,7 @@ Vector::Vector(const Triplet &v): Triplet(v) {}
 
 
 float Vector::get_length() const {
-    return x * x + y * y + z * z;
+    return sqrt(x * x + y * y + z * z);
 }
 
 Vector Vector::normalize() const {
