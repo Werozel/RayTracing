@@ -38,12 +38,16 @@ float Parallelepiped::get_c() const { return c;}
 Ray::Ray(const Point &start_point, const Vector &dir) {start = new Point(start_point); direction = new Vector(dir);}
 
 float Ray::distance_to_point (const Point &p) const {
-    Vector v = Vector(*start, p).normalize();
-    float cos = v * *direction;
+    Vector v = Vector(*start, p);
+    float cos = v * *direction / v.get_length() / direction->get_length();
     if (cos <= 0) {
         return distance(*start, p);
     } else {
-        return distance(p, *start + (v * *direction)/ direction->get_length() * direction->normalize());
+        Point t = *start;
+        float k = (v * *direction)/ direction->get_length();
+        Vector shift = k * *direction;
+        t = t + shift;
+        return distance(p, t);
     }
 }
 

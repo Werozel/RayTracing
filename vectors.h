@@ -16,6 +16,7 @@ class Ray;
 
 
 float distance(const Point &p1, const Point &p2);
+float plain_distance(const Point &p1, const Point &p2);
 
 
 class Triplet {

@@ -7,8 +7,16 @@ float distance(const Point &p1, const Point &p2) {
     float x = p1.get_x() - p2.get_x();
     float y = p1.get_y() - p2.get_y();
     float z = p1.get_z() - p2.get_z();
-    return x*x + y*y + z*z;
+    return sqrt(x*x + y*y + z*z);
 }
+
+float plain_distance(const Point &p1, const Point &p2) {
+    float x = p1.get_x() - p2.get_x();
+    float y = p1.get_y() - p2.get_y();
+    return sqrt(x*x + y*y);
+}
+
+
 
 Triplet::Triplet(const Triplet &t): x(t.get_x()), y(t.get_y()), z(t.get_z()) {}
 
