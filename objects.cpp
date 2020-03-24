@@ -44,8 +44,8 @@ float Ray::distance_to_point (const Point &p) const {
         return distance(*start, p);
     } else {
         Point t = *start;
-        float k = (v * *direction)/ direction->get_length();
-        Vector shift = k * *direction;
+        float k = (v * direction->normalize())/ direction->get_length();
+        Vector shift = k * direction->normalize();
         t = t + shift;
         return distance(p, t);
     }
