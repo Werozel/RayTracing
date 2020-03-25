@@ -16,6 +16,10 @@ float plain_distance(const Point &p1, const Point &p2) {
     return sqrt(x*x + y*y);
 }
 
+float get_angle(const Vector &v1, const Vector &v2) {
+    return v1 * v2 / v1.get_length() / v2.get_length();
+}
+
 
 // -------------------- Triplet ----------------------------
 Triplet::Triplet(const Triplet &t): x(t.get_x()), y(t.get_y()), z(t.get_z()) {}
@@ -61,12 +65,16 @@ float RGB::get_b() const {return b;}
 
 void RGB::operator= (const Triplet &v) { x = r = v.get_x(); y = g = v.get_y(); z = b = v.get_z();}
 
+RGB RGB::operator* (const float &n) const {
+    float new_r = std::min<float>(255, n * r);
+    float new_g = std::min<float>(255, n * g);
+    float new_b = std::min<float>(255, n * b);
+    return RGB(new_r, new_g, new_b);
+}
+
 
 // ------------------ Light -------------------------
-Light::Light (const Point &pos, const float &intens = 1) {
-    position = pos;
-    intensity = intens;
-}
+Light::Light (const Point &pos, const float &intens = 1): position(pos), intensity(intens) {}
 
 Point Light::get_position() const { return position;} 
 float Light::get_intensity() const { return intensity;}

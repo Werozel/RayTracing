@@ -17,6 +17,7 @@ class Ray;
 
 float distance(const Point &p1, const Point &p2);
 float plain_distance(const Point &p1, const Point &p2);
+float get_angle(const Vector &v1, const Vector &v2);
 
 
 class Triplet {
@@ -81,6 +82,7 @@ class RGB: public Triplet {
         float get_b() const;
 
         void operator= (const Triplet &v);
+        RGB operator* (const float &n) const;
 
         friend std::ostream & operator<< (std::ostream &out, const RGB &v) { return out << (char)v.get_r() << (char)v.get_g() << (char)v.get_b();}
 };
@@ -97,7 +99,6 @@ class Light {
         float get_intensity() const;
 
         void operator= (const Light &light);
-
 };
 
 
