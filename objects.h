@@ -40,7 +40,7 @@ class Sphere: public Object {
         float radius;
 
         Sphere (const float &rad, const RGB &col, 
-                const Point &pos, const SurfaceType &surf_type, const float &shine = 60): 
+                const Point &pos, const SurfaceType &surf_type, const float &shine = 70): 
             Object(col, pos, surf_type, shine), radius(rad) {}
         Sphere (const Sphere &s);
 
@@ -58,7 +58,7 @@ class Parallelepiped: public Object {
         float c;
 
         Parallelepiped (const float &n, const RGB &col, 
-                        const Point &pos, const SurfaceType &surf_type, const float &shine = 60): 
+                        const Point &pos, const SurfaceType &surf_type, const float &shine = 70): 
             Object(col, pos, surf_type, shine), a(n), b(n), c(n) {}
         Parallelepiped (const float &ta, const float &tb, const float &tc, 
                         const RGB &col, const Point &pos, const SurfaceType &surf_type, const float &shine): 

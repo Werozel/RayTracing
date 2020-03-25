@@ -84,6 +84,9 @@ class RGB: public Triplet {
         void operator= (const Triplet &v);
         RGB operator* (const float &n) const;
 
+        bool operator== (const RGB &col) const;
+        bool operator!= (const RGB &col) const;
+
         friend std::ostream & operator<< (std::ostream &out, const RGB &v) { return out << (char)v.get_r() << (char)v.get_g() << (char)v.get_b();}
 };
 

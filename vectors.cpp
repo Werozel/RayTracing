@@ -65,6 +65,14 @@ float RGB::get_b() const {return b;}
 
 void RGB::operator= (const Triplet &v) { x = r = v.get_x(); y = g = v.get_y(); z = b = v.get_z();}
 
+bool RGB::operator== (const RGB &col) const {
+    return (r == col.get_r() && g == col.get_g() && b == col.get_b());
+}
+
+bool RGB::operator!= (const RGB &col) const {
+    return (r != col.get_r() || g != col.get_g() || b != col.get_b());
+}
+
 RGB RGB::operator* (const float &n) const {
     float new_r = std::min<float>(255, n * r);
     float new_g = std::min<float>(255, n * g);
