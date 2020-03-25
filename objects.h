@@ -21,12 +21,14 @@ class Object {
         RGB *color;
         Point *position;
         SurfaceType surfaceType;
+        float shininess;
 
-        Object(const RGB &col, const Point &pos, const SurfaceType &stype);
+        Object(const RGB &col, const Point &pos, const SurfaceType &stype, const float &shine = 60);
 
         RGB get_color() const;
         Point get_position() const;
         SurfaceType get_stype() const;
+        float get_shininess() const;
 
         virtual Point ray_intersection(const Ray &ray) const;
 
@@ -37,9 +39,9 @@ class Sphere: public Object {
     public:
         float radius;
 
-        Sphere (const float &f, const RGB &col, 
-                const Point &pos, const SurfaceType &surf_type): 
-            Object(col, pos, surf_type), radius(f) {}
+        Sphere (const float &rad, const RGB &col, 
+                const Point &pos, const SurfaceType &surf_type, const float &shine = 60): 
+            Object(col, pos, surf_type, shine), radius(rad) {}
         Sphere (const Sphere &s);
 
         float get_radius() const;
@@ -56,11 +58,11 @@ class Parallelepiped: public Object {
         float c;
 
         Parallelepiped (const float &n, const RGB &col, 
-                        const Point &pos, const SurfaceType &surf_type): 
-            Object(col, pos, surf_type), a(n), b(n), c(n) {}
+                        const Point &pos, const SurfaceType &surf_type, const float &shine = 60): 
+            Object(col, pos, surf_type, shine), a(n), b(n), c(n) {}
         Parallelepiped (const float &ta, const float &tb, const float &tc, 
-                        const RGB &col, const Point &pos, const SurfaceType &surf_type): 
-            Object(col, pos, surf_type), a(ta), b(tb), c(tc) {}
+                        const RGB &col, const Point &pos, const SurfaceType &surf_type, const float &shine): 
+            Object(col, pos, surf_type, shine), a(ta), b(tb), c(tc) {}
         Parallelepiped (const Parallelepiped &p);
 
         virtual Point ray_intesection(const Ray &ray) const = 0;

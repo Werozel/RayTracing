@@ -26,11 +26,16 @@ RGB cast_ray(const Ray &ray, const std::vector<Sphere> &objects, const std::vect
             for (auto light: lights) {
                 Vector vector_of_incidence(intersection_point, light.position);
                 float angle_of_incidence = get_angle(norm, vector_of_incidence);
-                if (angle_of_incidence >= 0) {
+                if (angle_of_incidence > 0) {
                     brightness += angle_of_incidence * light.intensity;
-                }
-            }
 
+                    // No point calculating glares in points hidden from light
+                    Vector to_camera = 2 * (vector_of_incidence * norm) * norm - vector_of_incidence;
+                    float angle_of_reflection = get_angle(norm, to_camera);
+                    brightness += std::pow(angle_of_reflection, objects[i].get_shininess());
+                }
+                
+            }
             return *objects[i].color * brightness;
         }
     }
@@ -79,11 +84,16 @@ int main (int argc, char **argv) {
     std::vector<Sphere> objects;
     std::vector<Light> lights;
 
-    lights.push_back(Light(Point(width/4, height/4, -300), 0.85));
+    lights.push_back(Light(Point( 3 * width/4, height/6, -100), 0.85));
+    RGB white = RGB(255, 255, 255);
 
-    objects.push_back(Sphere(300, RGB(255, 0, 0), Point(300, 540, 600), OPAQUE));
-    objects.push_back(Sphere(150, RGB(162, 1, 202), Point(1400, 800, 400), OPAQUE));
-    objects.push_back(Sphere(200, RGB(0, 255, 0), Point(500, 540, 300), OPAQUE));
+    objects.push_back(Sphere(300, RGB(255, 0, 0), Point(300, 540, 800), OPAQUE));    // Red
+    objects.push_back(Sphere(150, RGB(162, 1, 202), Point(1400, 800, 600), OPAQUE)); // Purple
+    objects.push_back(Sphere(200, RGB(0, 255, 0), Point(500, 540, 500), OPAQUE));  // Green
+
+    for (auto light: lights) {
+        objects.push_back(Sphere(30, white, light.get_position(), OPAQUE));
+    }
     // Closest objects first
     std::sort(objects.begin(), objects.end(), comparator);
 
