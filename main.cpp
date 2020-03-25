@@ -79,7 +79,7 @@ int main (int argc, char **argv) {
     std::vector<Sphere> objects;
     std::vector<Light> lights;
 
-    lights.push_back(Light(Point(width/4, 0, -300), 1));
+    lights.push_back(Light(Point(width/4, height/4, -300), 0.85));
 
     objects.push_back(Sphere(300, RGB(255, 0, 0), Point(300, 540, 600), OPAQUE));
     objects.push_back(Sphere(150, RGB(162, 1, 202), Point(1400, 800, 400), OPAQUE));
