@@ -4,6 +4,7 @@
 #include <string>
 #include <time.h>
 #include <chrono>
+#include <algorithm>
 #include "vectors.h"
 #include "objects.h"
 
@@ -53,12 +54,21 @@ void render (const std::vector<Sphere> &objects, const int &w = width, const int
     out.close();
 }
 
+bool comparator (const Sphere &s1, const Sphere &s2) {
+    return s1.get_position().get_z() <= s2.get_position().get_z();
+}
+
 
 int main (int argc, char **argv) {
     srand(time(NULL));
 
     std::vector<Sphere> objects;
+
     objects.push_back(Sphere(300, RGB(255, 0, 0), Point(300, 540, 600), OPAQUE));
+    objects.push_back(Sphere(150, RGB(162, 1, 202), Point(1400, 800, 400), OPAQUE));
+    objects.push_back(Sphere(200, RGB(0, 255, 0), Point(500, 540, 300), OPAQUE));
+    // Closest objects first
+    std::sort(objects.begin(), objects.end(), comparator);
 
     render(objects, 1920, 1080);
     std::cout << "Ready!" << std::endl;

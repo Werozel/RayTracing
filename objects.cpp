@@ -16,7 +16,12 @@ bool Object::ray_intersection(const Ray &ray) const {
 
 
 Sphere::Sphere (const Sphere &s): Object(s.get_color(), s.get_position(), s.get_stype()), radius(s.get_radius()) {}
-void Sphere::operator= (const Sphere &s) { radius = s.get_radius();}
+void Sphere::operator= (const Sphere &s) {
+    color = new RGB(s.get_color()); 
+    position = new Point(s.get_position());
+    surfaceType = s.get_stype();
+    radius = s.get_radius();
+}
 
 float Sphere::get_radius () const { return radius;}
 
