@@ -60,3 +60,17 @@ float RGB::get_g() const {return g;}
 float RGB::get_b() const {return b;}
 
 void RGB::operator= (const Triplet &v) { x = r = v.get_x(); y = g = v.get_y(); z = b = v.get_z();}
+
+
+// ------------------ Light -------------------------
+Light::Light (const Point &pos, const float &intens = 1) {
+    position = pos;
+    intensity = intens;
+}
+
+Point Light::get_position() const { return position;} 
+float Light::get_intensity() const { return intensity;}
+
+void Light::operator= (const Light &light) { position = light.get_position(); intensity = get_intensity();}
+
+

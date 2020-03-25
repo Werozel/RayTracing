@@ -86,4 +86,19 @@ class RGB: public Triplet {
 };
 
 
+class Light {
+    public:
+        Point position;
+        float intensity;
+
+        Light(const Point &pos, const float &intens);  
+
+        Point get_position() const;
+        float get_intensity() const;
+
+        void operator= (const Light &light);
+
+};
+
+
 #endif
