@@ -62,6 +62,8 @@ class Point: public Triplet {
         Point(const float &n = 0.f): Triplet(n) {}
         Point(const float &tx, const float &ty, const float &tz): Triplet(tx, ty, tz) {}
         Point(const Triplet &v): Triplet(v) {} 
+
+        bool operator!= (const Point &p) const;
 };
 
 class RGB: public Triplet {

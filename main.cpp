@@ -18,7 +18,8 @@ const float fov = 90;
 
 RGB cast_ray(const Ray &ray, const std::vector<Sphere> &objects) {
     for (int i = 0; i < objects.size(); i++) {
-        if (objects[i].ray_intersection(ray)) {
+        Point intersection_point = objects[i].ray_intersection(ray);
+        if (intersection_point != Point(-1, -1, -1)) {
             return *objects[i].color;
         }
     }
@@ -53,6 +54,7 @@ void render (const std::vector<Sphere> &objects, const int &w = width, const int
 
     out.close();
 }
+
 
 bool comparator (const Sphere &s1, const Sphere &s2) {
     return s1.get_position().get_z() <= s2.get_position().get_z();

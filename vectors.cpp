@@ -17,7 +17,7 @@ float plain_distance(const Point &p1, const Point &p2) {
 }
 
 
-
+// -------------------- Triplet ----------------------------
 Triplet::Triplet(const Triplet &t): x(t.get_x()), y(t.get_y()), z(t.get_z()) {}
 
 
@@ -35,6 +35,11 @@ float Triplet::operator* (const Triplet &v) const { return x * v.get_x() + y * v
 Triplet Triplet::operator* (const float &n) const { return Triplet(x * n, y * n, z * n);}
 
 
+// ------------------------ Point --------------------------
+bool Point::operator!= (const Point &p) const { return (x != p.get_x() || y != p.get_y() || z != p.get_z());}
+
+
+// --------------------- Vector ----------------------------
 Vector::Vector(const Point &from, const Point &to): Triplet(to.get_x() - from.get_x(), to.get_y() - from.get_y(),to.get_z() - from.get_z()) {}
 Vector::Vector(const Triplet &v): Triplet(v) {}
 
@@ -49,6 +54,7 @@ Vector Vector::normalize() const {
 }
 
 
+// ------------------- RGB ----------------------------
 float RGB::get_r() const {return r;}
 float RGB::get_g() const {return g;}
 float RGB::get_b() const {return b;}
