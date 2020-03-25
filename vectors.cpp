@@ -10,12 +10,6 @@ float distance(const Point &p1, const Point &p2) {
     return sqrt(x*x + y*y + z*z);
 }
 
-float plain_distance(const Point &p1, const Point &p2) {
-    float x = p1.get_x() - p2.get_x();
-    float y = p1.get_y() - p2.get_y();
-    return sqrt(x*x + y*y);
-}
-
 float get_angle(const Vector &v1, const Vector &v2) {
     return v1 * v2 / v1.get_length() / v2.get_length();
 }

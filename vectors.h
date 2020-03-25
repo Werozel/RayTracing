@@ -15,8 +15,9 @@ class RGB;
 class Ray;
 
 
+// Calculates distance between 2 points
 float distance(const Point &p1, const Point &p2);
-float plain_distance(const Point &p1, const Point &p2);
+// Calculates a cos of an angle between 2 vectors
 float get_angle(const Vector &v1, const Vector &v2);
 
 
@@ -53,8 +54,10 @@ class Vector: public Triplet {
         Vector(const Triplet &v);
         Vector(const Point &from, const Point &to);
 
+        // Calculates a length of a current vector
         float get_length() const;
 
+        // Returns a normilized current vector
         Vector normalize() const;
 };
 

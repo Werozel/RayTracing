@@ -29,7 +29,8 @@ class Object {
         Point get_position() const;
         SurfaceType get_stype() const;
         float get_shininess() const;
-
+        
+        // Returns an intersection point of ray and current object
         virtual Point ray_intersection(const Ray &ray) const;
 
         virtual ~Object ();
@@ -48,6 +49,7 @@ class Sphere: public Object {
 
         void operator= (const Sphere &s);
 
+        // Returns an intersection point of ray and current object
         virtual Point ray_intersection(const Ray &ray) const;
 };
 
@@ -65,6 +67,7 @@ class Parallelepiped: public Object {
             Object(col, pos, surf_type, shine), a(ta), b(tb), c(tc) {}
         Parallelepiped (const Parallelepiped &p);
 
+        // Returns an intersection point of ray and current object
         virtual Point ray_intesection(const Ray &ray) const = 0;
         
         float get_a() const;
@@ -82,8 +85,10 @@ class Ray {
 
         Ray(const Point &start_point, const Vector &dir);
 
+        // Gets a point on a ray closest to given point
         Point get_closest_point_to_point (const Point &p) const;
 
+        // Gets a point on a ray closest to given object
         Point get_closest_point_to_object (const Object &o) const;
 
         ~Ray ();
