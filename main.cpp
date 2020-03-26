@@ -46,83 +46,57 @@ RGB cast_ray(const Ray &ray, const std::vector<Sphere> &objects, const std::vect
     if (intersection_point == no_intersection) return backgroundColor;
 
     Vector norm = Vector(intersected_obj.get_position(), intersection_point).normalize();
+    
+    // Calcu;ating brightness
     float brightness = 0; // Brightnesss of intersection point
-
-
-    if (intersected_obj.get_stype() == OPAQUE) {
-        for (auto light: lights) {
-            Vector vector_of_incidence(intersection_point, light.position); // To light direction
-            
-            Ray to_light(intersection_point, vector_of_incidence.normalize());
-            bool shade_flag = false; // Flag indicating if point is in shade for current light
-            for (int j = 0; j < objects.size(); j++) {
-                if (j == obj_i) continue; // Skipping current object
-                if (objects[j].ray_intersection(to_light) != no_intersection) {
-                    shade_flag = true;
-                    break;
-                }
+    for (auto light: lights) {
+        Vector vector_of_incidence(intersection_point, light.position); // To light direction
+        
+        Ray to_light(intersection_point, vector_of_incidence.normalize());
+        bool shade_flag = false; // Flag indicating if point is in shade for current light
+        for (int j = 0; j < objects.size(); j++) {
+            if (j == obj_i) continue; // Skipping current object
+            if (objects[j].ray_intersection(to_light) != no_intersection) {
+                shade_flag = true;
+                break;
             }
-            if (shade_flag) continue; // If in shade skipping brightness calculation
-
-            float angle_of_incidence = get_angle(norm, vector_of_incidence);
-            if (angle_of_incidence > 0) {
-                brightness += angle_of_incidence * light.intensity;
-
-                // Calculating glares
-                // Direction to camera from intersection point
-                Vector to_camera = 2 * (vector_of_incidence * norm) * norm - vector_of_incidence;
-                float angle_of_reflection = get_angle(norm, to_camera);
-                // Calculating a glare ---  K * (n * to_camera)^p
-                brightness += light.intensity * intersected_obj.get_shininess() * std::pow(angle_of_reflection, 2 * p);
-            }
-            
         }
-        return *intersected_obj.color * brightness;
+        if (shade_flag) continue; // If in shade skipping brightness calculation
 
+        float angle_of_incidence = get_angle(norm, vector_of_incidence);
+        if (angle_of_incidence > 0) {
+            if (intersected_obj.get_stype() == OPAQUE) brightness += angle_of_incidence * light.intensity;
+
+            // Calculating glares
+            // Direction to camera from intersection point
+            Vector to_camera = 2 * (vector_of_incidence * norm) * norm - vector_of_incidence;
+            float angle_of_reflection = get_angle(norm, to_camera);
+            // Calculating a glare ---  K * (n * to_camera)^p
+            brightness += light.intensity * intersected_obj.get_shininess() * std::pow(angle_of_reflection, 2 * p);
+        }
+    }
+
+    
+    // Getting the color of the point
+    RGB result = backgroundColor;
+    if (intersected_obj.get_stype() == OPAQUE) {
+        result = *intersected_obj.color * brightness;
 
     } else if (intersected_obj.get_stype() == MIRROR) {
         Vector reflect_dir = *ray.direction - 2 * (*ray.direction * norm) * norm;
         Vector reflect_start = reflect_dir * norm < 0 ? intersection_point - norm*1e-3 : intersection_point + norm*1e-3;
         Ray reflected_ray(intersection_point, reflect_dir);
 
-        RGB result = cast_ray(reflected_ray, objects, lights, depth + 1) * 0.90;
-
-        brightness = 0;
-        for (auto light: lights) {
-            Vector vector_of_incidence(intersection_point, light.position); // To light direction
-            
-            Ray to_light(intersection_point, vector_of_incidence.normalize());
-            bool shade_flag = false; // Flag indicating if point is in shade for current light
-            for (int j = 0; j < objects.size(); j++) {
-                if (j == obj_i) continue; // Skipping current object
-                if (objects[j].ray_intersection(to_light) != no_intersection) {
-                    shade_flag = true;
-                    break;
-                }
-            }
-            if (shade_flag) continue; // If in shade skipping brightness calculation
-
-            float angle_of_incidence = get_angle(norm, vector_of_incidence);
-            if (angle_of_incidence > 0) {
-
-                // Calculating glares
-                // Direction to camera from intersection point
-                Vector to_camera = 2 * (vector_of_incidence * norm) * norm - vector_of_incidence;
-                float angle_of_reflection = get_angle(norm, to_camera);
-                // Calculating a glare ---  K * (n * to_camera)^p
-                brightness += light.intensity * intersected_obj.get_shininess() * std::pow(angle_of_reflection, 7 * p);
-            }
-            
-        }
+        result = cast_ray(reflected_ray, objects, lights, depth + 1) * 0.90;
 
         RGB glare = white * brightness;
-        return result + glare;
+        result = result + glare;
         
     } else if (intersected_obj.get_stype() == TRANSPARENT) {
 
     }
             
-    return backgroundColor;
+    return result;
 }
 
 
