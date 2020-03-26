@@ -1,6 +1,9 @@
 CC = g++
 
 all:
+	g++ main.cpp vectors.cpp objects.cpp -o rt -O2
+
+debug:
 	g++ main.cpp vectors.cpp objects.cpp -o rt -g
 
 run: all

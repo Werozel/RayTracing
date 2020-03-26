@@ -35,6 +35,7 @@ Triplet Triplet::operator* (const float &n) const { return Triplet(x * n, y * n,
 
 // ------------------------ Point --------------------------
 bool Point::operator!= (const Point &p) const { return (x != p.get_x() || y != p.get_y() || z != p.get_z());}
+bool Point::operator== (const Point &p) const { return (x == p.get_x() && y == p.get_y() && z == p.get_z());}
 
 
 // --------------------- Vector ----------------------------
@@ -71,6 +72,13 @@ RGB RGB::operator* (const float &n) const {
     float new_r = std::min<float>(255, n * r);
     float new_g = std::min<float>(255, n * g);
     float new_b = std::min<float>(255, n * b);
+    return RGB(new_r, new_g, new_b);
+}
+
+RGB RGB::operator+ (const RGB &rgb) const {
+    float new_r = std::min<float>(255, rgb.get_r() + r);
+    float new_g = std::min<float>(255, rgb.get_g() + g);
+    float new_b = std::min<float>(255, rgb.get_b() + b);
     return RGB(new_r, new_g, new_b);
 }
 

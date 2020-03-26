@@ -16,6 +16,9 @@ class Ray;
 enum SurfaceType { OPAQUE, MIRROR, TRANSPARENT};
 enum IntersectionType { ABSORPTION, REFLECTION, REFLECTION_AND_REFRACTION};
 
+const float shine_default = 1;
+
+
 class Object {
     public:
         RGB *color;
@@ -23,7 +26,7 @@ class Object {
         SurfaceType surfaceType;
         float shininess;
 
-        Object(const RGB &col, const Point &pos, const SurfaceType &stype, const float &shine = 60);
+        Object(const RGB &col, const Point &pos, const SurfaceType &stype, const float &shine = shine_default);
 
         RGB get_color() const;
         Point get_position() const;
@@ -41,7 +44,7 @@ class Sphere: public Object {
         float radius;
 
         Sphere (const float &rad, const RGB &col, 
-                const Point &pos, const SurfaceType &surf_type, const float &shine = 70): 
+                const Point &pos, const SurfaceType &surf_type, const float &shine = shine_default): 
             Object(col, pos, surf_type, shine), radius(rad) {}
         Sphere (const Sphere &s);
 
@@ -60,7 +63,7 @@ class Parallelepiped: public Object {
         float c;
 
         Parallelepiped (const float &n, const RGB &col, 
-                        const Point &pos, const SurfaceType &surf_type, const float &shine = 70): 
+                        const Point &pos, const SurfaceType &surf_type, const float &shine = shine_default): 
             Object(col, pos, surf_type, shine), a(n), b(n), c(n) {}
         Parallelepiped (const float &ta, const float &tb, const float &tc, 
                         const RGB &col, const Point &pos, const SurfaceType &surf_type, const float &shine): 

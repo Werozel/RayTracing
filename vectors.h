@@ -68,6 +68,7 @@ class Point: public Triplet {
         Point(const Triplet &v): Triplet(v) {} 
 
         bool operator!= (const Point &p) const;
+        bool operator== (const Point &p) const;
 };
 
 class RGB: public Triplet {
@@ -86,6 +87,7 @@ class RGB: public Triplet {
 
         void operator= (const Triplet &v);
         RGB operator* (const float &n) const;
+        RGB operator+ (const RGB &rgb) const;
 
         bool operator== (const RGB &col) const;
         bool operator!= (const RGB &col) const;
