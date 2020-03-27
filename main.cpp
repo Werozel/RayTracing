@@ -8,6 +8,8 @@
 #include "vectors.h"
 #include "objects.h"
 
+#define STB_IMAGE_WRITE_IMPLEMENTATION
+#include "stb_image_write.h"
 
 const std::string output_file = "result.ppm";
 const RGB backgroundColor = RGB(114, 237, 237) * 0.9;
@@ -124,10 +126,29 @@ RGB cast_ray(const Ray &ray, const std::vector<Sphere> &objects,
 }
 
 
+char * get_jpg_data(const std::vector<std::vector<RGB> > &pix, const int &w, const int &h) {
+    char *result = new char[w * h * 3 + 3];
+    
+    int i = 0;
+    int offset = w * h;
+    for (auto row: pix) {
+        for (auto rgb: row) {
+            result[i] = (char)rgb.get_r();
+            result[i + 1] = (char)rgb.get_g();
+            result[i + 2] = (char)rgb.get_b();
+            i += 3;
+        }
+    }
+    return result;
+}
+
+
 void render (const std::vector<Sphere> &objects, const std::vector<Light> &lights,
              const int &w = width, const int &h = height) {
+    auto start_time = std::chrono::steady_clock::now();
     // pix - pixel matrix for picture generation
     std::vector<std::vector<RGB> > pix(h, std::vector<RGB>(w));
+    #pragma omp parallel for collapse(2)
     for (int i = 0; i < h; i++) {
         for (int j = 0; j < w; j++) {
             Point start = Point(w/2, h/2, -w/2);    // Point of view
@@ -136,19 +157,26 @@ void render (const std::vector<Sphere> &objects, const std::vector<Light> &light
             pix[i][j] = cast_ray(ray, objects, lights);
         }
     }
+    #pragma omp barrier
+
+    auto end_time = std::chrono::steady_clock::now();
+    std::chrono::duration<float> calculation_time = end_time - start_time;
+    std::cout << "Render time: " << calculation_time.count() << "s" << std::endl;
 
     // Generating picture in ppm P6 format
-    std::ofstream out;
-    out.open(output_file);
+    // std::ofstream out;
+    // out.open(output_file);
+    // out << "P6\n" << w << " " << h << "\n255\n";
+    // for (int i = 0; i < h; i++) {
+    //     for (int j = 0; j < w; j++) {
+    //         out << pix[i][j];
+    //     }
+    // }
+    // out.close();
 
-    out << "P6\n" << w << " " << h << "\n255\n";
-    for (int i = 0; i < h; i++) {
-        for (int j = 0; j < w; j++) {
-            out << pix[i][j];
-        }
-    }   
+    // Generating picture in png format
+    stbi_write_png("result.png", w, h, 3, get_jpg_data(pix, w, h), w * 3);
 
-    out.close();
 }
 
 
@@ -176,17 +204,9 @@ int main (int argc, char **argv) {
     objects.push_back(Sphere(200, RGB(0, 0, 255), Point(width/2, -200, 1100), MIRROR, 2)); // mirror
     objects.push_back(Sphere(300, RGB(0, 0, 255), Point(1700, 400, 500), OPAQUE, 2)); // Blue 2
 
-    auto start_time = std::chrono::steady_clock::now();
     // Start rendering
     render(objects, lights, 1920, 1080);
-
-    // Timer
     std::cout << "Ready!" << std::endl;
-    auto end_time = std::chrono::steady_clock::now();
-    std::chrono::duration<float> calculation_time = end_time - start_time;
-    std::cout << "Render time: " << calculation_time.count() << "s" << std::endl;
-
-
 
     return 0;
 }

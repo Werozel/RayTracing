@@ -21,5 +21,10 @@ add_custom_target(run
    COMMAND ./rt
 )
 
+add_custom_target(omp
+   COMMAND g++ -fopenmp main.cpp vectors.cpp objects.cpp -o rt -O3
+)
+
+
 target_link_libraries(rt ${ALL_LIBS} )
 
