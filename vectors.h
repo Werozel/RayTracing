@@ -46,12 +46,12 @@ class Triplet {
         Triplet operator-() const;
         float operator* (const Triplet &v) const;
         Triplet operator* (const float &n) const;
-        friend Triplet operator* (const float &n, const Triplet &t) {return Triplet(n * t.get_x(), n * t.get_y(), n * t.get_z());}
+        friend Triplet operator* (const float &n, const Triplet &t) 
+            {return Triplet(n * t.get_x(), n * t.get_y(), n * t.get_z());}
 };
 
 class Vector: public Triplet {
     public:
-
         Vector(const float &n = 0.f): Triplet(n) {}
         Vector(const float &tx, const float &ty, const float &tz): Triplet(tx, ty, tz) {}
         Vector(const Triplet &v);
@@ -81,7 +81,8 @@ class RGB: public Triplet {
         float b;
 
         RGB(const float &n = 0.f): Triplet(n), r(x), g(y), b(z) {}
-        RGB(const float &tr, const float &tg, const float &tb): Triplet(tr, tg, tb), r(x), g(y), b(z) {}
+        RGB(const float &tr, const float &tg, const float &tb): 
+                                    Triplet(tr, tg, tb), r(x), g(y), b(z) {}
         RGB(const Triplet &v): Triplet(v), r(x), g(y), b(z) {}
 
         float get_r() const;
@@ -95,7 +96,8 @@ class RGB: public Triplet {
         bool operator== (const RGB &col) const;
         bool operator!= (const RGB &col) const;
 
-        friend std::ostream & operator<< (std::ostream &out, const RGB &v) { return out << (char)v.get_r() << (char)v.get_g() << (char)v.get_b();}
+        friend std::ostream & operator<< (std::ostream &out, const RGB &v) 
+            { return out << (char)v.get_r() << (char)v.get_g() << (char)v.get_b();}
 };
 
 

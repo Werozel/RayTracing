@@ -77,7 +77,8 @@ class Parallelepiped: public Object {
             Object(col, pos, surf_type, shine, refr_index), a(n), b(n), c(n) {}
         Parallelepiped (const float &ta, const float &tb, const float &tc, 
                         const RGB &col, const Point &pos, const SurfaceType &surf_type, 
-                        const float &shine = shine_default, const float &refr_index = refractive_default): 
+                        const float &shine = shine_default, 
+                        const float &refr_index = refractive_default): 
             Object(col, pos, surf_type, shine, refr_index), a(ta), b(tb), c(tc) {}
         Parallelepiped (const Parallelepiped &p);
 
@@ -106,7 +107,6 @@ class Ray {
         Point get_closest_point_to_object (const Object &o) const;
 
         ~Ray ();
-        
 };
 
 #endif
