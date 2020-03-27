@@ -14,7 +14,7 @@ jobs:
     - name: CMake
       run: cmake CMakeLists.txt
     - name: Make
-      run: make
+      run: cmake CMakeLists.txt & make
     - name: Run
       run: ./rt
     - name: Check
