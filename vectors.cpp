@@ -14,6 +14,14 @@ float get_angle(const Vector &v1, const Vector &v2) {
     return v1 * v2 / v1.get_length() / v2.get_length();
 }
 
+float get_angle_sin(const Vector &v1, const Vector &v2) {
+    float cos = get_angle(v1, v2);
+    return std::sqrt(1 - cos * cos);
+}
+float get_angle_sin(const float &cos) {
+    return std::sqrt(1 - cos*cos);
+}
+
 
 // -------------------- Triplet ----------------------------
 Triplet::Triplet(const Triplet &t): x(t.get_x()), y(t.get_y()), z(t.get_z()) {}
@@ -24,7 +32,7 @@ float Triplet::get_y() const {return y;}
 float Triplet::get_z() const {return z;}
 
 void Triplet::operator= (const Triplet &t) { x = t.get_x(); y = t.get_y(); z = t.get_z();}
-inline bool Triplet::operator== (const Triplet &v) const { return (x==v.get_x() && y==v.get_y() && z==v.get_z());}
+bool Triplet::operator== (const Triplet &v) const { return (x==v.get_x() && y==v.get_y() && z==v.get_z());}
 
 Triplet Triplet::operator+ (const Triplet &v) const { return Triplet(x + v.get_x(), y + v.get_y(), z + v.get_z());}
 Triplet Triplet::operator- (const Triplet &v) const { return Triplet(x - v.get_x(), y - v.get_y(), z - v.get_z());}

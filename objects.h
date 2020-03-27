@@ -17,6 +17,7 @@ enum SurfaceType { OPAQUE, MIRROR, TRANSPARENT};
 enum IntersectionType { ABSORPTION, REFLECTION, REFLECTION_AND_REFRACTION};
 
 const float shine_default = 1;
+const float refractive_default = 1;
 
 
 class Object {
@@ -25,13 +26,18 @@ class Object {
         Point *position;
         SurfaceType surfaceType;
         float shininess;
+        float refractiveIndex;
 
-        Object(const RGB &col, const Point &pos, const SurfaceType &stype, const float &shine = shine_default);
+        Object(const RGB &col, const Point &pos, 
+               const SurfaceType &stype, 
+               const float &shine = shine_default, 
+               const float &refr_index = refractive_default);
 
         RGB get_color() const;
         Point get_position() const;
         SurfaceType get_stype() const;
         float get_shininess() const;
+        float get_refractive_index() const;
         
         // Returns an intersection point of ray and current object
         virtual Point ray_intersection(const Ray &ray) const;
@@ -44,8 +50,10 @@ class Sphere: public Object {
         float radius;
 
         Sphere (const float &rad, const RGB &col, 
-                const Point &pos, const SurfaceType &surf_type, const float &shine = shine_default): 
-            Object(col, pos, surf_type, shine), radius(rad) {}
+                const Point &pos, const SurfaceType &surf_type, 
+                const float &shine = shine_default, 
+                const float &refr_index = refractive_default): 
+            Object(col, pos, surf_type, shine, refr_index), radius(rad) {}
         Sphere (const Sphere &s);
 
         float get_radius() const;
@@ -63,11 +71,14 @@ class Parallelepiped: public Object {
         float c;
 
         Parallelepiped (const float &n, const RGB &col, 
-                        const Point &pos, const SurfaceType &surf_type, const float &shine = shine_default): 
-            Object(col, pos, surf_type, shine), a(n), b(n), c(n) {}
+                        const Point &pos, const SurfaceType &surf_type, 
+                        const float &shine = shine_default,
+                        const float &refr_index = refractive_default): 
+            Object(col, pos, surf_type, shine, refr_index), a(n), b(n), c(n) {}
         Parallelepiped (const float &ta, const float &tb, const float &tc, 
-                        const RGB &col, const Point &pos, const SurfaceType &surf_type, const float &shine): 
-            Object(col, pos, surf_type, shine), a(ta), b(tb), c(tc) {}
+                        const RGB &col, const Point &pos, const SurfaceType &surf_type, 
+                        const float &shine = shine_default, const float &refr_index = refractive_default): 
+            Object(col, pos, surf_type, shine, refr_index), a(ta), b(tb), c(tc) {}
         Parallelepiped (const Parallelepiped &p);
 
         // Returns an intersection point of ray and current object

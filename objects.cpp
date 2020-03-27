@@ -2,13 +2,14 @@
 #include "vectors.h"
 
 
-Object::Object(const RGB &col, const Point &pos, const SurfaceType &stype, const float &shine):
-     surfaceType(stype), shininess(shine) {color = new RGB(col); position = new Point(pos);}
+Object::Object(const RGB &col, const Point &pos, const SurfaceType &stype, const float &shine, const float &refr_index):
+     surfaceType(stype), shininess(shine), refractiveIndex(refr_index) {color = new RGB(col); position = new Point(pos);}
 
 RGB Object::get_color() const { return *color;}
 Point Object::get_position() const { return *position;}
 SurfaceType Object::get_stype() const { return surfaceType;}
 float Object::get_shininess() const { return shininess;}
+float Object::get_refractive_index() const { return refractiveIndex;}
 
 Object::~Object () {delete color; delete position;}
 
@@ -18,11 +19,12 @@ Point Object::ray_intersection(const Ray &ray) const {
 
 
 // --------------------- Sphere --------------------------
-Sphere::Sphere (const Sphere &s): Object(s.get_color(), s.get_position(), s.get_stype(), s.get_shininess()), radius(s.get_radius()) {}
+Sphere::Sphere (const Sphere &s): Object(s.get_color(), s.get_position(), s.get_stype(), s.get_shininess(), s.get_refractive_index()), radius(s.get_radius()) {}
 void Sphere::operator= (const Sphere &s) {
     color = new RGB(s.get_color()); 
     position = new Point(s.get_position());
     surfaceType = s.get_stype();
+    refractiveIndex = s.get_refractive_index();
     radius = s.get_radius();
 }
 
@@ -31,8 +33,10 @@ float Sphere::get_radius () const { return radius;}
 Point Sphere::ray_intersection(const Ray &ray) const {
     Point p = ray.get_closest_point_to_object(*this);
     float dist = distance(p, *position);
+    bool is_inside = distance(*ray.start, *position) <= radius;
     if (dist <= radius) {
         Vector v = Vector(p, *ray.start).normalize();
+        if (is_inside) v = -v;
         float half_horde = sqrt(radius * radius - dist * dist);
         return p + v * half_horde;
     } else {
@@ -62,14 +66,13 @@ Point Ray::get_closest_point_to_point(const Point &p) const {
     Vector v = Vector(*start, p);
     float cos = v * *direction / v.get_length() / direction->get_length();
     if (cos <= 0) {
-        return *start;
-    } else {
-        Point t = *start;
-        float k = (v * direction->normalize())/ direction->get_length();
-        Vector shift = k * direction->normalize();
-        t = t + shift;
-        return t;
-    }
+        v = -v;
+    } 
+    Point t = *start;
+    float k = (v * direction->normalize())/ direction->get_length();
+    Vector shift = k * direction->normalize();
+    t = t + shift;
+    return t;
 }
 
 Point Ray::get_closest_point_to_object (const Object &o) const {

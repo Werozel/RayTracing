@@ -43,7 +43,7 @@ RGB cast_ray(const Ray &ray, const std::vector<Sphere> &objects, const std::vect
         }
     }
 
-    if (intersection_point == no_intersection) return backgroundColor;
+    if (intersection_point == no_intersection)  { return backgroundColor;}
 
     Vector norm = Vector(intersected_obj.get_position(), intersection_point).normalize();
     
@@ -83,17 +83,41 @@ RGB cast_ray(const Ray &ray, const std::vector<Sphere> &objects, const std::vect
         result = *intersected_obj.color * brightness;
 
     } else if (intersected_obj.get_stype() == MIRROR) {
-        Vector reflect_dir = *ray.direction - 2 * (*ray.direction * norm) * norm;
-        Vector reflect_start = reflect_dir * norm < 0 ? intersection_point - norm*1e-3 : intersection_point + norm*1e-3;
-        Ray reflected_ray(intersection_point, reflect_dir);
 
+        Vector reflect_dir = *ray.direction - 2 * (*ray.direction * norm) * norm;
+        Ray reflected_ray(intersection_point, reflect_dir.normalize());
         result = cast_ray(reflected_ray, objects, lights, depth + 1) * 0.90;
 
         RGB glare = white * brightness;
         result = result + glare;
         
     } else if (intersected_obj.get_stype() == TRANSPARENT) {
+        
+        Vector reflect_dir = *ray.direction - 2 * (*ray.direction * norm) * norm;
+        Ray reflected_ray(intersection_point, reflect_dir.normalize());
+        RGB reflection_result = cast_ray(reflected_ray, objects, lights, depth + 1) * 0.2;        
 
+        Vector tmp_norm = norm;  // For calculating an angle between norm and ray direction
+        float angle_of_incidence = get_angle(-tmp_norm, *ray.direction); // Angle of incidence of current ray
+        float n1 = 1; 
+        float n2 = intersected_obj.get_refractive_index();
+        if (n1 != 1) std::cout << "Refractive index = " << n2 << std::endl;
+        if (angle_of_incidence < 0) {   // ray is inside the object
+            std::swap(n1, n2);
+            angle_of_incidence *= -1;
+            tmp_norm = -tmp_norm;
+        }
+        float k = n1 / n2;
+        float refraction_angle = std::sqrt(1 - std::pow(k, 2)*std::pow(get_angle_sin(angle_of_incidence), 2));
+        Vector refract_dir = *ray.direction * k + (k * angle_of_incidence - refraction_angle) * tmp_norm;
+        
+        Point refract_start = refract_dir*norm < 0 ? intersection_point - norm * 0.001 : intersection_point + norm * 0.001;
+        Ray refraction_ray(refract_start, refract_dir.normalize());
+
+        RGB refraction_result = cast_ray(refraction_ray, objects, lights, depth + 1) * 0.8;
+
+        RGB glare = white * brightness;
+        result = (reflection_result + refraction_result) * 0.95 + glare;
     }
             
     return result;
@@ -143,15 +167,16 @@ int main (int argc, char **argv) {
     std::vector<Light> lights;
 
     // Adding lights
-    lights.push_back(Light(Point( 3 * width/4, height/6, -100), 0.5));
+    lights.push_back(Light(Point( 3 * width/4, 0, -100), 0.5));
     lights.push_back(Light(Point(width/5, 0, 100), 0.5));
     lights.push_back(Light(Point(width/2, height/2, -200), 0.25));
 
     // Adding objects
-    objects.push_back(Sphere(300, RGB(255, 0, 0), Point(300, 540, 800), OPAQUE));    // Red
-    objects.push_back(Sphere(150, RGB(162, 1, 202), Point(1400, 800, 600), MIRROR, 3)); // Purple
-    objects.push_back(Sphere(200, RGB(0, 255, 0), Point(500, 540, 500), OPAQUE, 10));  // Green
-    objects.push_back(Sphere(200, RGB(255, 255, 255), Point(width/2, height/4, 1100), MIRROR, 3));
+    objects.push_back(Sphere(300, RGB(255, 0, 0), Point(300, 540, 900), OPAQUE));    // Red
+    objects.push_back(Sphere(150, RGB(162, 1, 202), Point(1400, 800, 600), OPAQUE, 3)); // Purple
+    objects.push_back(Sphere(200, RGB(0, 255, 0), Point(700, 600, 400), TRANSPARENT, 3, 1.7));  // transparent
+    objects.push_back(Sphere(200, RGB(0, 0, 255), Point(width/2, -200, 1100), MIRROR, 2)); // mirror
+    objects.push_back(Sphere(300, RGB(0, 0, 255), Point(1700, 400, 500), OPAQUE, 2)); // Blue 2
 
     // for (auto light: lights) {
     //     objects.push_back(Sphere(30, white, light.get_position(), OPAQUE));
@@ -169,6 +194,8 @@ int main (int argc, char **argv) {
     auto end_time = std::chrono::steady_clock::now();
     std::chrono::duration<float> calculation_time = end_time - start_time;
     std::cout << "Render time: " << calculation_time.count() << "s" << std::endl;
+
+
 
     return 0;
 }

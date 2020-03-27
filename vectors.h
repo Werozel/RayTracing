@@ -19,6 +19,9 @@ class Ray;
 float distance(const Point &p1, const Point &p2);
 // Calculates a cos of an angle between 2 vectors
 float get_angle(const Vector &v1, const Vector &v2);
+// Calculates a sin of an angle between 2 vectors
+float get_angle_sin(const Vector &v1, const Vector &v2);
+float get_angle_sin(const float &cos);
 
 
 class Triplet {
@@ -36,7 +39,7 @@ class Triplet {
         float get_z() const;
 
         virtual void operator= (const Triplet &t);
-        inline bool operator== (const Triplet &v) const;
+        virtual bool operator== (const Triplet &v) const;
 
         Triplet operator+ (const Triplet &v) const;
         Triplet operator- (const Triplet &v) const;
