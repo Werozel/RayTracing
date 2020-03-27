@@ -148,7 +148,7 @@ void render (const std::vector<Sphere> &objects, const std::vector<Light> &light
     auto start_time = std::chrono::steady_clock::now();
     // pix - pixel matrix for picture generation
     std::vector<std::vector<RGB> > pix(h, std::vector<RGB>(w));
-    #pragma omp parallel for collapse(2)
+    #pragma omp target teams distribute parallel for collapse(2)
     for (int i = 0; i < h; i++) {
         for (int j = 0; j < w; j++) {
             Point start = Point(w/2, h/2, -w/2);    // Point of view
