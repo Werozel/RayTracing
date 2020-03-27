@@ -1,0 +1,25 @@
+cmake_minimum_required (VERSION 3.8)
+
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS_RELEASE} -O2")
+
+project (rt)
+
+# get rid of annoying MSVC warnings.
+add_definitions(-D_CRT_SECURE_NO_WARNINGS)
+
+set (CMAKE_CXX_STANDARD 11)
+
+add_executable(rt main.cpp objects.cpp vectors.cpp)
+
+add_custom_target(clean-all
+   COMMAND ${CMAKE_BUILD_TOOL} clean
+   COMMAND rm -r CMakeCache.txt cmake_install.cmake CMakeFiles Makefile
+)
+
+add_custom_target(run
+   COMMAND make
+   COMMAND ./rt
+)
+
+target_link_libraries(rt ${ALL_LIBS} )
+

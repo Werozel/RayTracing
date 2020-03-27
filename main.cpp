@@ -126,7 +126,6 @@ RGB cast_ray(const Ray &ray, const std::vector<Sphere> &objects,
 
 void render (const std::vector<Sphere> &objects, const std::vector<Light> &lights,
              const int &w = width, const int &h = height) {
-
     // pix - pixel matrix for picture generation
     std::vector<std::vector<RGB> > pix(h, std::vector<RGB>(w));
     for (int i = 0; i < h; i++) {
@@ -137,7 +136,6 @@ void render (const std::vector<Sphere> &objects, const std::vector<Light> &light
             pix[i][j] = cast_ray(ray, objects, lights);
         }
     }
-
 
     // Generating picture in ppm P6 format
     std::ofstream out;
