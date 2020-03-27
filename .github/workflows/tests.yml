@@ -12,10 +12,10 @@ jobs:
     steps:
     - uses: actions/checkout@v2
     - name: Make
-      run: make
+      run: cmake CMakeLists.txt & make
     - name: Run
       run: ./rt
     - name: Check
-      run: make check
+      run: test -r result.png && echo "Result generated" || (echo "Result not generated!" & exit 1)
     - name: Clean
-      run: make clean
+      run: make clean-all
