@@ -12,7 +12,6 @@ set (CMAKE_CXX_STANDARD 11)
 add_executable(rt main.cpp vectors.cpp objects.cpp)
 
 add_custom_target(ALL 
-   COMMAND export OMP_NUM_THREADS=32
    COMMAND g++ -fopenmp -foffload="-lm" main.cpp vectors.cpp objects.cpp -o rt -O3
 )
 
