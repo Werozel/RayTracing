@@ -6,14 +6,13 @@
 #include <chrono>
 #include <algorithm>
 #include <omp.h>
-#include "constants.h"
-#include "vectors.h"
-#include "objects.h"
-#include "materials.h"
-#include "polygons.h"
+#include "src/constants.h"
+#include "src/vectors.h"
+#include "src/objects.h"
+#include "src/materials.h"
 
 #define STB_IMAGE_WRITE_IMPLEMENTATION
-#include "stb_image_write.h"
+#include "stb/stb_image_write.h"
 
 
 RGB cast_ray(const Ray &ray, const std::vector<Sphere> &objects, 

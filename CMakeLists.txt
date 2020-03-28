@@ -9,10 +9,10 @@ add_definitions(-D_CRT_SECURE_NO_WARNINGS)
 
 set (CMAKE_CXX_STANDARD 17)
 
-add_executable(rt main.cpp vectors.cpp objects.cpp materials.cpp polygons.cpp)
+add_executable(rt main.cpp src/vectors.cpp src/objects.cpp src/materials.cpp)
 
 add_custom_target(ALL 
-   COMMAND g++ -fopenmp -foffload="-lm" main.cpp vectors.cpp objects.cpp materials.cpp polygon.cpp -o rt -O3
+   COMMAND g++ -fopenmp -foffload="-lm" main.cpp src/vectors.cpp src/objects.cpp src/materials.cpp -o rt -O3
 )
 
 add_custom_target(clean-all
@@ -23,11 +23,6 @@ add_custom_target(clean-all
 add_custom_target(run
    COMMAND make
    COMMAND ./rt
-)
-
-add_custom_target(omp
-   COMMAND export OMP_NUM_THREADS=32
-   COMMAND g++ -fopenmp -foffload="-lm" main.cpp vectors.cpp objects.cpp materials.cpp polygon.cpp -o rt -O3
 )
 
 
