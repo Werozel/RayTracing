@@ -1,5 +1,6 @@
 #include "vectors.h"
 #include "objects.h"
+#include "materials.h"
 #include <cmath>
 
 
@@ -99,10 +100,11 @@ RGB RGB::operator+ (const RGB &rgb) const {
 
 
 // ------------------ Light -------------------------
-Light::Light (const Point &pos, const float &intens = 1): position(pos), intensity(intens) {}
+Light::Light (const Point &pos, const float &intens, const Colors &col): position(pos), intensity(intens), color(get_color(col)) {}
 
 Point Light::get_position() const { return position;} 
 float Light::get_intensity() const { return intensity;}
+RGB Light::get_light_color() const { return color;}
 
 void Light::operator= (const Light &light) 
     { position = light.get_position(); intensity = get_intensity();}

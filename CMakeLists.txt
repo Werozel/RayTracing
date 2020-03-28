@@ -11,10 +11,6 @@ set (CMAKE_CXX_STANDARD 17)
 
 add_executable(rt main.cpp src/vectors.cpp src/objects.cpp src/materials.cpp)
 
-add_custom_target(ALL 
-   COMMAND g++ -fopenmp -foffload="-lm" main.cpp src/vectors.cpp src/objects.cpp src/materials.cpp -o rt -O3
-)
-
 add_custom_target(clean-all
    COMMAND ${CMAKE_BUILD_TOOL} clean
    COMMAND rm -r CMakeCache.txt cmake_install.cmake CMakeFiles Makefile

@@ -3,6 +3,7 @@
 
 #include <iostream>
 #include <cmath>
+#include "constants.h"
 
 
 class Object;
@@ -105,11 +106,13 @@ class Light {
     public:
         Point position;
         float intensity;
+        RGB color;
 
-        Light(const Point &pos, const float &intens);  
+        Light(const Point &pos, const float &intens = 1, const Colors &col = WHITE);  
 
         Point get_position() const;
         float get_intensity() const;
+        RGB get_light_color() const;
 
         void operator= (const Light &light);
 };
