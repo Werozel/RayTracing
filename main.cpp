@@ -6,27 +6,20 @@
 #include <chrono>
 #include <algorithm>
 #include <omp.h>
+#include "constants.h"
 #include "vectors.h"
 #include "objects.h"
+#include "materials.h"
+#include "polygons.h"
 
 #define STB_IMAGE_WRITE_IMPLEMENTATION
 #include "stb_image_write.h"
 
-const std::string output_file = "result.ppm";
-const RGB backgroundColor = RGB(114, 237, 237) * 0.9;
-const RGB white = RGB(255, 255, 255);
-const RGB gray = RGB(220, 220, 220);
-const int width = 1920;
-const int height = 1080;
-const float fov = 90;
-const int recursion_gap = 5;
-const int p = 70;
-
 
 RGB cast_ray(const Ray &ray, const std::vector<Sphere> &objects, 
              const std::vector<Light> &lights, const int &depth = 0) {
-    if (objects.size() == 0) return backgroundColor;
-    if (depth == recursion_gap) return backgroundColor;
+    if (objects.size() == 0) return get_color();
+    if (depth == recursion_gap) return get_color();
 
     Point no_intersection(-1, -1, -1);
     Point intersection_point = no_intersection;
@@ -47,7 +40,7 @@ RGB cast_ray(const Ray &ray, const std::vector<Sphere> &objects,
         }
     }
 
-    if (intersection_point == no_intersection)  { return backgroundColor;}
+    if (intersection_point == no_intersection)  { return get_color();}
 
     Vector norm = Vector(intersected_obj.get_position(), intersection_point).normalize();
     
@@ -69,65 +62,69 @@ RGB cast_ray(const Ray &ray, const std::vector<Sphere> &objects,
 
         float angle_of_incidence = get_angle(norm, vector_of_incidence);
         if (angle_of_incidence > 0) {
-            if (intersected_obj.get_stype() == OPAQUE) brightness += angle_of_incidence * light.intensity;
-
-            // Calculating glares
+            // Calculating deffuse brightness
+            if (intersected_obj.get_stype() == OPAQUE ) brightness += angle_of_incidence * light.intensity * intersected_obj.get_deffuse_coef();
+            
+            // Calculating glare brightness
             // Direction to camera from intersection point
             Vector to_camera = 2 * (vector_of_incidence * norm) * norm - vector_of_incidence;
             float angle_of_reflection = get_angle(norm, to_camera);
             // Calculating a glare ---  K * (n * to_camera)^p
-            brightness += light.intensity * intersected_obj.get_shininess() * std::pow(angle_of_reflection, 2 * p);
+            brightness += light.intensity * intersected_obj.get_mirror_coef() * std::pow(angle_of_reflection, intersected_obj.get_shininess());
         }
     }
 
     
     // Getting the color of the point
-    RGB result = backgroundColor;
+    RGB result = get_color();
     if (intersected_obj.get_stype() == OPAQUE) {
-        result = *intersected_obj.color * brightness;
+        result = intersected_obj.get_color() * brightness;
 
-    } else if (intersected_obj.get_stype() == MIRROR) {
+    } else {       // if MIRROR or
         Vector reflect_dir = *ray.direction - 2 * (*ray.direction * norm) * norm;
         Ray reflected_ray(intersection_point, reflect_dir.normalize());
-        result = cast_ray(reflected_ray, objects, lights, depth + 1) * 0.90;
+        RGB reflection_result = cast_ray(reflected_ray, objects, lights, depth + 1);
 
-        RGB glare = white * brightness;
-        result = result + glare;
+        RGB refraction_result(0, 0, 0);
 
-    } else if (intersected_obj.get_stype() == TRANSPARENT) {
-        Vector reflect_dir = *ray.direction - 2 * (*ray.direction * norm) * norm;
-        Ray reflected_ray(intersection_point, reflect_dir.normalize());
-        RGB reflection_result = cast_ray(reflected_ray, objects, lights, depth + 1) * 0.2;        
+        if (intersected_obj.get_stype() == TRANSPARENT) {
+            reflection_result = reflection_result * 0.2;        
 
-        Vector tmp_norm = norm;  // For calculating an angle between norm and ray direction
-        float angle_of_incidence = get_angle(-tmp_norm, *ray.direction); // Angle of incidence of current ray
-        float n1 = 1; 
-        float n2 = intersected_obj.get_refractive_index();
-        if (angle_of_incidence < 0) {   // If ray is inside the object reverse the layout
-            std::swap(n1, n2);
-            angle_of_incidence *= -1;
-            tmp_norm = -tmp_norm;
+            Vector tmp_norm = norm;  // For calculating an angle between norm and ray direction
+            float angle_of_incidence = get_angle(-tmp_norm, *ray.direction); // Angle of incidence of current ray
+            float n1 = 1; 
+            float n2 = intersected_obj.get_refractive_index();
+            if (angle_of_incidence < 0) {   // If ray is inside the object reverse the layout
+                std::swap(n1, n2);
+                angle_of_incidence *= -1;
+                tmp_norm = -tmp_norm;
+            }
+            float k = n1 / n2;
+            float refraction_angle = std::sqrt(1 - std::pow(k, 2) * std::pow(get_angle_sin(angle_of_incidence), 2));
+            Vector refract_dir = *ray.direction * k + (k * angle_of_incidence - refraction_angle) * tmp_norm;
+
+            // Offset starting point so it doesn't hit itself 
+            Point refract_start = refract_dir*norm < 0 ? intersection_point - norm * 0.001 : 
+                                                        intersection_point + norm * 0.001;
+            Ray refraction_ray(refract_start, refract_dir.normalize());
+
+            // Casting refraction ray
+            refraction_result = cast_ray(refraction_ray, objects, lights, depth + 1) * 0.8;
+        } else {
+            reflection_result = reflection_result * 0.9;
         }
-        float k = n1 / n2;
-        float refraction_angle = std::sqrt(1 - std::pow(k, 2) * std::pow(get_angle_sin(angle_of_incidence), 2));
-        Vector refract_dir = *ray.direction * k + (k * angle_of_incidence - refraction_angle) * tmp_norm;
-        // Offset starting point so it doesn't hit itself 
-        Point refract_start = refract_dir*norm < 0 ? intersection_point - norm * 0.001 : 
-                                                     intersection_point + norm * 0.001;
-        Ray refraction_ray(refract_start, refract_dir.normalize());
 
-        // Casting refraction ray
-        RGB refraction_result = cast_ray(refraction_ray, objects, lights, depth + 1) * 0.8;
+        RGB glare = get_color(WHITE) * brightness * intersected_obj.get_mirror_coef();
+        result = (reflection_result + refraction_result) * 0.9 + glare;
 
-        RGB glare = white * brightness;
-        result = (reflection_result + refraction_result) * 0.95 + glare;
     }
 
     return result;
 }
 
 
-char * get_jpg_data(const std::vector<std::vector<RGB> > &pix, const int &w, const int &h) {
+
+char * get_png_data(const std::vector<std::vector<RGB> > &pix, const int &w, const int &h) {
     char *result = new char[w * h * 3 + 3];
     
     int i = 0;
@@ -165,19 +162,10 @@ void render (const std::vector<Sphere> &objects, const std::vector<Light> &light
     std::chrono::duration<float> calculation_time = end_time - start_time;
     std::cout << "Render time: " << calculation_time.count() << "s" << std::endl;
 
-    // Generating picture in ppm P6 format
-    // std::ofstream out;
-    // out.open(output_file);
-    // out << "P6\n" << w << " " << h << "\n255\n";
-    // for (int i = 0; i < h; i++) {
-    //     for (int j = 0; j < w; j++) {
-    //         out << pix[i][j];
-    //     }
-    // }
-    // out.close();
-
     // Generating picture in png format
-    stbi_write_png("result.png", w, h, 3, get_jpg_data(pix, w, h), w * 3);
+    char *picture = get_png_data(pix, w, h);
+    stbi_write_png("result.png", w, h, 3, picture, w * 3);
+    delete [] picture;
 
 }
 
@@ -200,11 +188,11 @@ int main (int argc, char **argv) {
     lights.push_back(Light(Point(width/2, height/2, -200), 0.25));
 
     // Adding objects
-    objects.push_back(Sphere(300, RGB(255, 0, 0), Point(300, 540, 900), OPAQUE));    // Red
-    objects.push_back(Sphere(150, RGB(162, 1, 202), Point(1400, 800, 600), OPAQUE, 3)); // Purple
-    objects.push_back(Sphere(200, RGB(0, 255, 0), Point(700, 600, 400), TRANSPARENT, 3, 1.7));  // transparent
-    objects.push_back(Sphere(200, RGB(0, 0, 255), Point(width/2, -200, 1100), MIRROR, 2)); // mirror
-    objects.push_back(Sphere(300, RGB(0, 0, 255), Point(1700, 400, 500), OPAQUE, 2)); // Blue 2
+    objects.push_back(Sphere(300, Point(300, 540, 900), get_material(PLASTIC, RED)));    // Red
+    objects.push_back(Sphere(150, Point(1400, 800, 600), get_material(PLASTIC, PURPLE))); // Purple
+    objects.push_back(Sphere(200, Point(700, 600, 400), get_material(GLASS)));  // transparent
+    objects.push_back(Sphere(200, Point(width/2, -200, 1100), get_material(METAL))); // mirror
+    objects.push_back(Sphere(300, Point(1700, 400, 500), get_material(PLASTIC, BLUE))); // Blue 2
 
     // Start rendering
     render(objects, lights, 1920, 1080);
