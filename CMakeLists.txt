@@ -1,15 +1,38 @@
-cmake_minimum_required (VERSION 3.8)
-
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS_RELEASE} -O3 -fopenmp -foffload='-lm'")
-
+cmake_minimum_required (VERSION 2.8)
 project (rt)
 
-# get rid of annoying MSVC warnings.
-add_definitions(-D_CRT_SECURE_NO_WARNINGS)
+include(CheckCXXCompilerFlag)
 
-set (CMAKE_CXX_STANDARD 17)
+set(LIB_DIR "${CMAKE_CURRENT_SOURCE_DIR}/lib")
 
-add_executable(rt main.cpp src/vectors.cpp src/objects.cpp src/materials.cpp)
+function(enable_cxx_compiler_flag_if_supported flag)
+string(FIND "${CMAKE_CXX_FLAGS}" "${flag}" flag_already_set)
+if(flag_already_set EQUAL -1)
+check_cxx_compiler_flag("${flag}" flag_supported)
+if(flag_supported)
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${flag}" PARENT_SCOPE)
+endif()
+unset(flag_supported CACHE)
+endif()
+endfunction()
+
+#enable_cxx_compiler_flag_if_supported("-Wall")
+enable_cxx_compiler_flag_if_supported("-Wextra")
+enable_cxx_compiler_flag_if_supported("-pedantic")
+enable_cxx_compiler_flag_if_supported("-std=c++17")
+enable_cxx_compiler_flag_if_supported("-fopenmp")
+enable_cxx_compiler_flag_if_supported("-O3")
+#enable_cxx_compiler_flag_if_supported("-Ofast")
+
+file(GLOB GLOBAL_SOURCES *.h *.cpp)
+file(GLOB SOURCES src/*.cpp stb/*.cpp)
+
+add_executable(${PROJECT_NAME} ${GLOBAL_SOURCES} ${SOURCES} )
+
+# STB
+set(STB_LIB_DIR "${LIB_DIR}/stb")
+target_include_directories(${PROJECT_NAME} PRIVATE ${STB_LIB_DIR})
+
 
 add_custom_target(clean-all
    COMMAND ${CMAKE_BUILD_TOOL} clean
@@ -20,7 +43,3 @@ add_custom_target(run
    COMMAND make
    COMMAND ./rt
 )
-
-
-target_link_libraries(rt ${ALL_LIBS} )
-
