@@ -36,6 +36,9 @@ class Object {
         // Returns an intersection point of ray and current object
         virtual Point ray_intersection(const Ray &ray) const;
 
+        // Returns a normal vector through the point on object
+        virtual Vector get_norm(const Point &p) const;
+
         virtual ~Object ();
 };
 
@@ -52,8 +55,33 @@ class Sphere: public Object {
 
         void operator= (const Sphere &s);
 
-        // Returns an intersection point of ray and current object
         virtual Point ray_intersection(const Ray &ray) const;
+        // Vector from center to p
+        virtual Vector get_norm(const Point &p) const;
+
+};
+
+
+class Polygon: public Object {
+    public:
+        // In relation to position
+        Vector *v1;
+        Vector *v2;
+        Vector *v3;
+
+        Polygon (const Point &pos, const Material &m, const Vector &p1, const Vector &p2, const Vector &p3);
+        Polygon (const Polygon &p);
+
+        Vector get_v1() const;
+        Vector get_v2() const;
+        Vector get_v3() const;
+
+        void operator= (const Polygon &p);
+
+        virtual Point ray_intersection(const Ray &ray) const;
+        virtual Vector get_norm(const Point &p) const;
+
+        ~Polygon();
 };
 
 

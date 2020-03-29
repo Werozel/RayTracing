@@ -41,7 +41,7 @@ RGB cast_ray(const Ray &ray, const std::vector<Sphere> &objects,
 
     if (intersection_point == no_intersection)  { return get_color();}
 
-    Vector norm = Vector(intersected_obj.get_position(), intersection_point).normalize();
+    Vector norm = intersected_obj.get_norm(intersection_point);
     
     // Calcu;ating brightness
     float brightness = 0; // Brightnesss of intersection point

@@ -21,6 +21,11 @@ Point Object::ray_intersection(const Ray &ray) const {
     return Point(0, 0, 0);
 }
 
+Vector Object::get_norm(const Point &p) const {
+    return Vector(0, 0, 0);
+}
+
+
 
 // --------------------- Sphere --------------------------
 Sphere::Sphere (const Sphere &s): 
@@ -49,6 +54,44 @@ Point Sphere::ray_intersection(const Ray &ray) const {
     }
 }
 
+Vector Sphere::get_norm(const Point &p) const {
+    return Vector(*position, p).normalize();
+}
+
+
+// ----------------------- Polygon ---------------------------
+Polygon::Polygon (const Point &pos, const Material &m, const Vector &p1, const Vector &p2, const Vector &p3):
+    Object(pos, m), v1(new Vector(p1)), v2(new Vector(p2)), v3(new Vector(p3)) {}
+
+Polygon::Polygon (const Polygon &p): Object(p.get_position(), p.get_material()), 
+    v1(new Vector(p.get_v1())), v2(new Vector(p.get_v2())), v3(new Vector(p.get_v3())) {}
+
+
+Vector Polygon::get_v1() const { return *v1;}
+Vector Polygon::get_v2() const { return *v2;}
+Vector Polygon::get_v3() const { return *v3;}
+
+void Polygon::operator= (const Polygon &p) {
+    position = new Point(p.get_position());
+    material = new Material(p.get_material());
+    v1 = new Vector(p.get_v1());
+    v2 = new Vector(p.get_v2());
+    v3 = new Vector(p.get_v3());
+}
+
+Point Polygon::ray_intersection(const Ray &ray) const {
+    
+}
+
+Vector Polygon::get_norm(const Point &p) const {
+
+}
+
+Polygon::~Polygon() {
+    delete v3;
+    delete v2;
+    delete v1;
+}
 
 // ----------------------- Ray -------------------------------
 Ray::Ray(const Point &start_point, const Vector &dir) 
