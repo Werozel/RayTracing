@@ -23,6 +23,8 @@ float get_angle(const Vector &v1, const Vector &v2);
 // Calculates a sin of an angle between 2 vectors
 float get_angle_sin(const Vector &v1, const Vector &v2);
 float get_angle_sin(const float &cos);
+// Calculates cross product of vectors
+Vector cross_prod(const Vector &v1, const Vector &v2);
 
 
 class Triplet {

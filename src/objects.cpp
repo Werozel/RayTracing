@@ -70,6 +70,10 @@ Polygon::Polygon (const Polygon &p): Object(p.get_position(), p.get_material()),
 Vector Polygon::get_v1() const { return *v1;}
 Vector Polygon::get_v2() const { return *v2;}
 Vector Polygon::get_v3() const { return *v3;}
+Point Polygon::get_p1() const { return *position + *v1;}
+Point Polygon::get_p2() const { return *position + *v2;}
+Point Polygon::get_p3() const { return *position + *v3;}
+
 
 void Polygon::operator= (const Polygon &p) {
     position = new Point(p.get_position());
@@ -80,11 +84,27 @@ void Polygon::operator= (const Polygon &p) {
 }
 
 Point Polygon::ray_intersection(const Ray &ray) const {
-    
+    Point p1 = get_p1(), p2 = get_p2(), p3 = get_p3();
+    Vector D = ray.get_direction();
+    Vector E1(p1, p2);
+    Vector E2(p1, p3);
+    Vector T(p1, ray.get_start());
+    Vector P(cross_prod(D, E2));
+    Vector Q(cross_prod(T, E1));
+    float z = P * E1;
+    float u = P * T / z;
+    float v = Q * D / z;
+    float t = 1 - u - v;
+    if (t >= 0 && u >= 0 && v >= 0) {
+        return Point(t * p2 + u * p3 + v * p1);
+    } else {
+        return Point(-1, -1, -1);
+    }
 }
 
 Vector Polygon::get_norm(const Point &p) const {
-
+    // TODO figure out the direction of norm
+    return cross_prod(Vector(*position, get_v1()), Vector(*position, get_v2()));
 }
 
 Polygon::~Polygon() {
@@ -96,6 +116,10 @@ Polygon::~Polygon() {
 // ----------------------- Ray -------------------------------
 Ray::Ray(const Point &start_point, const Vector &dir) 
     {start = new Point(start_point); direction = new Vector(dir);}
+
+Point Ray::get_start() const { return *start;}
+Vector Ray::get_direction() const { return *direction;}
+
 
 Point Ray::get_closest_point_to_point(const Point &p) const {
     Vector v = Vector(*start, p);
