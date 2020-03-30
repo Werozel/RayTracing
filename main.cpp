@@ -5,6 +5,7 @@
 #include <time.h>
 #include <chrono>
 #include <algorithm>
+#include <cstring>
 #include <omp.h>
 #include "src/constants.h"
 #include "src/vectors.h"
@@ -14,8 +15,11 @@
 #define STB_IMAGE_WRITE_IMPLEMENTATION
 #include "stb/stb_image_write.h"
 
+char *output_file = new char[100];
+int threads_num = 32;
+int scene_number = 1;
 
-RGB cast_ray(const Ray &ray, const std::vector<Polygon> &objects, 
+RGB cast_ray(const Ray &ray, const std::vector<Sphere> &objects, 
              const std::vector<Light> &lights, const int &depth = 0) {
     if (objects.size() == 0) return get_color();
     if (depth == recursion_gap) return get_color();
@@ -23,7 +27,7 @@ RGB cast_ray(const Ray &ray, const std::vector<Polygon> &objects,
     Point no_intersection(-1, -1, -1);
     Point intersection_point = no_intersection;
     float min_dist = std::numeric_limits<float>::max();
-    Polygon intersected_obj(objects[0]);
+    Sphere intersected_obj(objects[0]);
     int obj_i = 0;
     for (int i = 0; i < objects.size(); i++) {
         // Returns Point(-1, -1, -1) if no intersection detected
@@ -140,12 +144,12 @@ char * get_png_data(const std::vector<std::vector<RGB> > &pix, const int &w, con
 }
 
 
-void render (const std::vector<Polygon> &objects, const std::vector<Light> &lights,
+void render (const std::vector<Sphere> &objects, const std::vector<Light> &lights,
              const int &w = width, const int &h = height) {
     auto start_time = std::chrono::steady_clock::now();
     // pix - pixel matrix for picture generation
     std::vector<std::vector<RGB> > pix(h, std::vector<RGB>(w));
-    omp_set_num_threads(32);
+    omp_set_num_threads(threads_num);
     #pragma omp parallel for collapse(2)
     for (int i = 0; i < h; i++) {
         for (int j = 0; j < w; j++) {
@@ -163,12 +167,12 @@ void render (const std::vector<Polygon> &objects, const std::vector<Light> &ligh
 
     // Generating picture in png format
     char *picture = get_png_data(pix, w, h);
-    stbi_write_png("result.png", w, h, 3, picture, w * 3);
+    stbi_write_png(output_file, w, h, 3, picture, w * 3);
     delete [] picture;
 
 }
 
-
+// Loads .obj file
 void load_object(const std::string &file_name, const Point &pos, std::vector<Polygon> *arr) {
     std::ifstream ifs("obj/" + file_name);
     std::vector<Point> points;
@@ -189,9 +193,22 @@ void load_object(const std::string &file_name, const Point &pos, std::vector<Pol
 }
 
 
-
 int main (int argc, char **argv) {
     srand(time(NULL));
+
+    strcpy(output_file, "result.png");
+    for (int i = 1; i < argc - 1; i+=2) {
+        if (strcmp(argv[i], "-out") == 0) {
+            strcpy(output_file, argv[i + 1]);
+        } else if (strcmp(argv[i], "-scene") == 0) {
+            scene_number = atoi(argv[i + 1]);
+        } else if (strcmp(argv[i], "-threads") == 0) {
+            threads_num = atoi(argv[i + 1]);
+        } else {
+            std::cout << "Unknown flag: " << argv[i] << std::endl;
+            continue;
+        }
+    }
 
     std::vector<Sphere> objects;
     std::vector<Polygon> polygons;
@@ -210,11 +227,11 @@ int main (int argc, char **argv) {
     objects.push_back(Sphere(300, Point(1700, 400, 500), get_material(PLASTIC, BLUE))); // Blue 2
 
     // Loading objects
-    load_object("duck.obj", Point(width/2, height/2, width/2), &polygons);
-    std::cout << polygons.size() << std::endl;
+    // load_object("duck.obj", Point(width/2, height/2, width/2), &polygons);
+    // std::cout << polygons.size() << std::endl;
 
     // Start rendering
-    render(polygons, lights, 1920, 1080);
+    render(objects, lights, 1920, 1080);
     std::cout << "Ready!" << std::endl;
 
     return 0;
