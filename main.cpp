@@ -169,16 +169,11 @@ void render (const std::vector<Sphere> &objects, const std::vector<Light> &light
 }
 
 
-// Comparator for objects - closest first
-bool comparator (const Sphere &s1, const Sphere &s2) {
-    return s1.get_position().get_z() <= s2.get_position().get_z();
-}
-
-
 int main (int argc, char **argv) {
     srand(time(NULL));
 
     std::vector<Sphere> objects;
+    std::vector<Polygon> polygons;
     std::vector<Light> lights;
 
     // Adding lights
@@ -192,6 +187,8 @@ int main (int argc, char **argv) {
     objects.push_back(Sphere(200, Point(700, 600, 400), get_material(GLASS)));  // transparent
     objects.push_back(Sphere(200, Point(width/2, -200, 1100), get_material(METAL))); // mirror
     objects.push_back(Sphere(300, Point(1700, 400, 500), get_material(PLASTIC, BLUE))); // Blue 2
+
+    
 
     // Start rendering
     render(objects, lights, 1920, 1080);
