@@ -85,19 +85,24 @@ void Polygon::operator= (const Polygon &p) {
 
 Point Polygon::ray_intersection(const Ray &ray) const {
     Point p1 = get_p1(), p2 = get_p2(), p3 = get_p3();
+    Point ray_start = ray.get_start();
     Vector D = ray.get_direction();
-    Vector E1(p1, p2);
-    Vector E2(p1, p3);
-    Vector T(p1, ray.get_start());
+    Vector E1(p1, p2), E2(p1, p3);
+    Vector T(p1, ray_start);
     Vector P(cross_prod(D, E2));
     Vector Q(cross_prod(T, E1));
+
     float z = P * E1;
+    float t = Q * E2 / z;
     float u = P * T / z;
     float v = Q * D / z;
-    float t = 1 - u - v;
-    if (t >= 0 && u >= 0 && v >= 0) {
+    float k = 1 - u - v;
+    
+    if (k >= 0 && u >= 0 && v >= 0) {
         std::cout << "Intersected" << std::endl;
-        return Point(t * p2 + u * p3 + v * p1);
+        std::cout << k << " " << u << " " << v << std::endl;
+        // return Point(k * p2 + u * p3 + v * p1);
+        return Point(ray_start + t * D);
     } else {
         return Point(-1, -1, -1);
     }
@@ -116,7 +121,7 @@ Polygon::~Polygon() {
 
 // ----------------------- Ray -------------------------------
 Ray::Ray(const Point &start_point, const Vector &dir) 
-    {start = new Point(start_point); direction = new Vector(dir);}
+    {start = new Point(start_point); direction = new Vector(dir.normalize());}
 
 Point Ray::get_start() const { return *start;}
 Vector Ray::get_direction() const { return *direction;}
