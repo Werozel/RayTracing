@@ -91,6 +91,35 @@ class Polygon: public Object {
 };
 
 
+class Rectangle: public Object {
+    public:
+        Polygon p1;
+        Polygon p2;
+
+        Rectangle(const Point &pos, const Material &m, const Point &p1_t, const Point &p2_t, const Point &p3_t, const Point p4_t);
+        Rectangle(const Rectangle &r);
+
+        void operator= (const Rectangle &r);
+
+        Point ray_intersection(const Ray &ray) const;
+        Vector get_norm(const Point &p) const;
+};
+
+
+class Bottom: public Object {
+    public:
+
+        Bottom(const Point &pos, const Material &m): Object(pos, m) {}
+        Bottom(const Bottom &f): Object(f.get_position(), f.get_material()) {}
+
+        void operator= (const Bottom &f);
+
+        Point ray_intersection(const Ray &ray) const;
+        Vector get_norm(const Point &p) const;
+
+};
+
+
 class Ray {
     public:
         Point *start;

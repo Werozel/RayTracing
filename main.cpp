@@ -62,9 +62,13 @@ RGB cast_ray(const Ray &ray, const std::vector<Object *> &objects,
         bool shade_flag = false; // Flag indicating if point is in shade for current light
         for (int j = 0; j < objects.size(); j++) {
             if (j == obj_i) continue; // Skipping current object
-            if (objects[j]->ray_intersection(to_light) != no_intersection) {
-                shade_flag = true;
-                break;
+            Point shade_hit_point = objects[j]->ray_intersection(to_light);
+            if (shade_hit_point != no_intersection) {
+                if (distance(shade_hit_point, intersection_point) <= 
+                    distance(intersection_point, light.get_position())) {
+                    shade_flag = true;
+                    break;
+                }
             }
         }
         if (shade_flag) continue; // If in shade skipping brightness calculation
@@ -253,18 +257,20 @@ int main (int argc, char **argv) {
 
     // Adding lights
     lights.push_back(Light(Point( 3 * width/4, 0, -100), 0.5));
-    lights.push_back(Light(Point(width/5, 0, 100), 0.5));
-    lights.push_back(Light(Point(width/2, height/2, -200), 0.25));
+    lights.push_back(Light(Point(width/5, 0, 100), 0.75));
+    lights.push_back(Light(Point(width/2, height/2, -200), 0.4));
 
     // Adding objects
     objects.push_back(new Sphere(300, Point(100, 540, 900), get_material(PLASTIC, RED)));    // Red
     objects.push_back(new Sphere(150, Point(1200, 800, 600), get_material(METAL, BLUE))); // Purple
     objects.push_back(new Sphere(200, Point(500, 600, 400), get_material(GLASS)));  // transparent
     // objects.push_back(new Sphere(200, Point(width/2, -200, 1100), get_material(METAL))); // mirror
-    objects.push_back(new Sphere(300, Point(1500, 400, 500), get_material(PLASTIC, BLUE))); // Blue 2
+    objects.push_back(new Sphere(300, Point(1500, 100, 500), get_material(PLASTIC, BLUE))); // Blue 2
+
+    objects.push_back(new Bottom(Point(width/2, height * 0.9, 0), get_material(PLASTIC, PURPLE)));
 
     // Loading objects
-    load_object("duck.obj", Point(width * 0.63, 2 * height * 0.2, width * 0.3), get_material(PLASTIC, PURPLE), 60, objects);
+    load_object("duck.obj", Point(width * 0.63, 750, width * 0.3), get_material(PLASTIC, GREEN), 60, objects);
 
     // Start rendering
     std::cout << "Started" << std::endl;

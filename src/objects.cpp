@@ -141,6 +141,76 @@ Polygon::~Polygon() {
     delete norm;
 }
 
+// ----------------------- Rectangle -------------------------
+
+Rectangle::Rectangle(const Point &pos, const Material &m, 
+                     const Point &p1_t, const Point &p2_t, 
+                     const Point &p3_t, const Point p4_t):
+        Object(pos, m), p1(Polygon(pos, m, p1_t, p2_t, p3_t)), 
+        p2(Polygon(pos, m, p3_t, p4_t, p1_t)) {}
+
+Rectangle::Rectangle(const Rectangle &r):
+    Object(r.get_position(), r.get_material()), p1(r.p1), p2(r.p2) {}
+
+void Rectangle::operator= (const Rectangle &r) {
+    if (&r == this) { return;}
+    delete position;
+    delete material;
+    position = new Point(r.get_position());
+    material = new Material(r.get_material());
+    p1 = r.p1;
+    p2 = r.p2;
+}
+
+Point Rectangle::ray_intersection(const Ray &ray) const {
+    Point res = p1.ray_intersection(ray);
+    if (res != Point(-1, -1, -1)) {
+        return p2.ray_intersection(ray);
+    }
+    return res;
+}
+
+Vector Rectangle::get_norm (const Point &p) const {
+    return p1.get_norm(p);
+}
+
+// ------------------------ Floor ---------------------------
+
+void Bottom::operator= (const Bottom &f) {
+    if (&f == this) { return;}
+    delete position;
+    delete material;
+    position = new Point(f.get_position());
+    material = new Material(f.get_material());
+}
+
+Point Bottom::ray_intersection(const Ray &ray) const {
+    Point p1(*position + Point(1, 0, 0)), p2(*position + Point(0, 0, 1)), p3(*position);
+    Vector E1(p1, p2), E2(p1, p3);
+    Vector T(p1, ray.get_start());
+    Vector P(cross_prod(ray.get_direction(), E2));
+    Vector Q(cross_prod(T, E1));
+
+    float z = P * E1;
+    float t = Q * E2 / z;
+    // float u = P * T / z;
+    // float v = Q * ray.get_direction() / z;
+    // float k = 1 - u - v;
+    
+    if ( t > 0) {
+        // return Point(k * *p2 + u * *p3 + v * *p1);
+        return Point(ray.get_start() + t * ray.get_direction());
+    } else {
+        return Point(-1, -1, -1);
+    } 
+}
+
+Vector Bottom::get_norm(const Point &p) const {
+    return Vector(0, -1, 0);
+}
+
+
+
 // ----------------------- Ray -------------------------------
 Ray::Ray(): start(nullptr), direction(nullptr) {}
 Ray::Ray(const Point &start_point, const Vector &dir) 
