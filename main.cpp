@@ -230,7 +230,6 @@ void load_object(const std::string &file_name, const Point &pos,
     ifs.close();
 }
 
-
 int main (int argc, char **argv) {
     srand(time(NULL));
     int smoothness = 1;
