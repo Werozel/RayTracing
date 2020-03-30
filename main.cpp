@@ -15,7 +15,7 @@
 #include "stb/stb_image_write.h"
 
 
-RGB cast_ray(const Ray &ray, const std::vector<Sphere> &objects, 
+RGB cast_ray(const Ray &ray, const std::vector<Polygon> &objects, 
              const std::vector<Light> &lights, const int &depth = 0) {
     if (objects.size() == 0) return get_color();
     if (depth == recursion_gap) return get_color();
@@ -23,7 +23,7 @@ RGB cast_ray(const Ray &ray, const std::vector<Sphere> &objects,
     Point no_intersection(-1, -1, -1);
     Point intersection_point = no_intersection;
     float min_dist = std::numeric_limits<float>::max();
-    Sphere intersected_obj(objects[0]);
+    Polygon intersected_obj(objects[0]);
     int obj_i = 0;
     for (int i = 0; i < objects.size(); i++) {
         // Returns Point(-1, -1, -1) if no intersection detected
@@ -140,13 +140,13 @@ char * get_png_data(const std::vector<std::vector<RGB> > &pix, const int &w, con
 }
 
 
-void render (const std::vector<Sphere> &objects, const std::vector<Light> &lights,
+void render (const std::vector<Polygon> &objects, const std::vector<Light> &lights,
              const int &w = width, const int &h = height) {
     auto start_time = std::chrono::steady_clock::now();
     // pix - pixel matrix for picture generation
     std::vector<std::vector<RGB> > pix(h, std::vector<RGB>(w));
     omp_set_num_threads(32);
-    #pragma omp target teams distribute parallel for collapse(2)
+    #pragma omp parallel for collapse(2)
     for (int i = 0; i < h; i++) {
         for (int j = 0; j < w; j++) {
             Point start = Point(w/2, h/2, -w/2);    // Point of view
@@ -169,6 +169,27 @@ void render (const std::vector<Sphere> &objects, const std::vector<Light> &light
 }
 
 
+void load_object(const std::string &file_name, const Point &pos, std::vector<Polygon> *arr) {
+    std::ifstream ifs("obj/" + file_name);
+    std::vector<Point> points;
+    points.push_back(Point(0, 0, 0));
+    char mode;
+    float x, y, z;
+    while (ifs >> mode && mode == 'v') {
+        ifs >> x >> y >> z;
+        points.push_back(Point(x, y, z) + pos);
+    }
+
+    int i1, i2, i3;
+    while (!ifs.eof() && mode == 'f') {
+        ifs >> i1 >> i2 >> i3;
+        arr->push_back(Polygon(pos, get_material(PLASTIC, RED), points[i1], points[i2], points[i3]));
+        ifs >> mode;
+    }
+}
+
+
+
 int main (int argc, char **argv) {
     srand(time(NULL));
 
@@ -188,10 +209,12 @@ int main (int argc, char **argv) {
     objects.push_back(Sphere(200, Point(width/2, -200, 1100), get_material(METAL))); // mirror
     objects.push_back(Sphere(300, Point(1700, 400, 500), get_material(PLASTIC, BLUE))); // Blue 2
 
-    
+    // Loading objects
+    load_object("duck.obj", Point(width/2, height/2, width/2), &polygons);
+    std::cout << polygons.size() << std::endl;
 
     // Start rendering
-    render(objects, lights, 1920, 1080);
+    render(polygons, lights, 1920, 1080);
     std::cout << "Ready!" << std::endl;
 
     return 0;

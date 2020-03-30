@@ -40,3 +40,7 @@ add_custom_target(run
    COMMAND make
    COMMAND ./rt
 )
+
+add_custom_target(debug
+   COMMAND g++ -fopenmp main.cpp src/*cpp -o rt -g
+)

@@ -96,6 +96,7 @@ Point Polygon::ray_intersection(const Ray &ray) const {
     float v = Q * D / z;
     float t = 1 - u - v;
     if (t >= 0 && u >= 0 && v >= 0) {
+        std::cout << "Intersected" << std::endl;
         return Point(t * p2 + u * p3 + v * p1);
     } else {
         return Point(-1, -1, -1);
