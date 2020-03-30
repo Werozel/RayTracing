@@ -10,3 +10,5 @@ A program that implements ray-tracing rendering technique
 ``make run``
 
 ``make clean``
+
+Program generates result.png
