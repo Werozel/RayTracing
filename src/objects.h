@@ -64,14 +64,14 @@ class Sphere: public Object {
 
 class Polygon: public Object {
     public:
-        // In relation to position
-        Vector *v1;
-        Vector *v2;
-        Vector *v3;
+        Point *p1;
+        Point *p2;
+        Point *p3;
 
-        Polygon (const Point &pos, const Material &m, const Vector &p1, const Vector &p2, const Vector &p3);
+        Polygon (const Point &pos, const Material &m, const Point &p1, const Point &p2, const Point &p3);
         Polygon (const Polygon &p);
 
+        // From position to pi
         Vector get_v1() const;
         Vector get_v2() const;
         Vector get_v3() const;

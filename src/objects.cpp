@@ -60,27 +60,27 @@ Vector Sphere::get_norm(const Point &p) const {
 
 
 // ----------------------- Polygon ---------------------------
-Polygon::Polygon (const Point &pos, const Material &m, const Vector &p1, const Vector &p2, const Vector &p3):
-    Object(pos, m), v1(new Vector(p1)), v2(new Vector(p2)), v3(new Vector(p3)) {}
+Polygon::Polygon (const Point &pos, const Material &m, const Point &p1_t, const Point &p2_t, const Point &p3_t):
+    Object(pos, m), p1(new Point(p1_t)), p2(new Point (p2_t)), p3(new Point(p3_t)) {}
 
 Polygon::Polygon (const Polygon &p): Object(p.get_position(), p.get_material()), 
-    v1(new Vector(p.get_v1())), v2(new Vector(p.get_v2())), v3(new Vector(p.get_v3())) {}
+    p1(new Point(p.get_p1())), p2(new Point(p.get_p2())), p3(new Point(p.get_p3())) {}
 
 
-Vector Polygon::get_v1() const { return *v1;}
-Vector Polygon::get_v2() const { return *v2;}
-Vector Polygon::get_v3() const { return *v3;}
-Point Polygon::get_p1() const { return *position + *v1;}
-Point Polygon::get_p2() const { return *position + *v2;}
-Point Polygon::get_p3() const { return *position + *v3;}
+Vector Polygon::get_v1() const { return Vector(*position, *p1);}
+Vector Polygon::get_v2() const { return Vector(*position, *p2);}
+Vector Polygon::get_v3() const { return Vector(*position, *p3);}
+Point Polygon::get_p1() const { return *p1;}
+Point Polygon::get_p2() const { return *p2;}
+Point Polygon::get_p3() const { return *p3;}
 
 
 void Polygon::operator= (const Polygon &p) {
     position = new Point(p.get_position());
     material = new Material(p.get_material());
-    v1 = new Vector(p.get_v1());
-    v2 = new Vector(p.get_v2());
-    v3 = new Vector(p.get_v3());
+    p1 = new Point(p.get_p1());
+    p2 = new Point(p.get_p2());
+    p3 = new Point(p.get_p3());
 }
 
 Point Polygon::ray_intersection(const Ray &ray) const {
@@ -99,8 +99,6 @@ Point Polygon::ray_intersection(const Ray &ray) const {
     float k = 1 - u - v;
     
     if (k >= 0 && u >= 0 && v >= 0) {
-        std::cout << "Intersected" << std::endl;
-        std::cout << k << " " << u << " " << v << std::endl;
         // return Point(k * p2 + u * p3 + v * p1);
         return Point(ray_start + t * D);
     } else {
@@ -110,13 +108,13 @@ Point Polygon::ray_intersection(const Ray &ray) const {
 
 Vector Polygon::get_norm(const Point &p) const {
     // TODO figure out the direction of norm
-    return cross_prod(Vector(*position, get_v1()), Vector(*position, get_v2()));
+    return cross_prod(Vector(p, get_p1()), Vector(p, get_p2())).normalize();
 }
 
 Polygon::~Polygon() {
-    delete v3;
-    delete v2;
-    delete v1;
+    delete p1;
+    delete p2;
+    delete p3;
 }
 
 // ----------------------- Ray -------------------------------

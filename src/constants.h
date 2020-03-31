@@ -23,6 +23,7 @@ enum Materials {
 enum SurfaceType { OPAQUE, MIRROR, TRANSPARENT};
 enum IntersectionType { ABSORPTION, REFLECTION, REFLECTION_AND_REFRACTION};
 
+
 const int width = 1920;
 const int height = 1080;
 

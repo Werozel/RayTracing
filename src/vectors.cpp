@@ -51,6 +51,8 @@ Triplet Triplet::operator-() const { return Triplet(-x, -y, -z);}
 float Triplet::operator* (const Triplet &v) const 
     { return x * v.get_x() + y * v.get_y() + z * v.get_z();}
 Triplet Triplet::operator* (const float &n) const { return Triplet(x * n, y * n, z * n);}
+Triplet Triplet::operator/ (const float &n) const { return Triplet(x / n, y / n, z / n);}
+
 
 
 // ------------------------ Point --------------------------

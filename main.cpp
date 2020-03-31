@@ -18,16 +18,17 @@
 char *output_file = new char[100];
 int threads_num = 32;
 int scene_number = 1;
+const Point no_intersection(-1, -1, -1);
 
-RGB cast_ray(const Ray &ray, const std::vector<Sphere> &objects, 
+
+RGB cast_ray(const Ray &ray, const std::vector<Polygon> &objects, 
              const std::vector<Light> &lights, const int &depth = 0) {
     if (objects.size() == 0) return get_color();
     if (depth == recursion_gap) return get_color();
 
-    Point no_intersection(-1, -1, -1);
     Point intersection_point = no_intersection;
     float min_dist = std::numeric_limits<float>::max();
-    Sphere intersected_obj(objects[0]);
+    Polygon intersected_obj(objects[0]);
     int obj_i = 0;
     for (int i = 0; i < objects.size(); i++) {
         // Returns Point(-1, -1, -1) if no intersection detected
@@ -46,13 +47,18 @@ RGB cast_ray(const Ray &ray, const std::vector<Sphere> &objects,
     if (intersection_point == no_intersection)  { return get_color();}
 
     Vector norm = intersected_obj.get_norm(intersection_point);
+    // printf("Norm: %.4f %.4f %.4f\n", norm.get_x(), norm.get_y(), norm.get_z());
     
-    // Calcu;ating brightness
+    // Calculating brightness
     float brightness = 0; // Brightnesss of intersection point
     for (auto light: lights) {
-        Vector vector_of_incidence(intersection_point, light.position); // To light direction
+        Vector vector_of_incidence = Vector(intersection_point, light.get_position()).normalize(); // To light direction
         
-        Ray to_light(intersection_point, vector_of_incidence.normalize());
+        // Point to_light_start = vector_of_incidence*norm < 0 ? intersection_point - norm * 0.1 : 
+        //                                                 intersection_point + norm * 0.1;
+        Point to_light_start = intersection_point - norm * 0.1;
+
+        Ray to_light(to_light_start, vector_of_incidence);
         bool shade_flag = false; // Flag indicating if point is in shade for current light
         for (int j = 0; j < objects.size(); j++) {
             if (j == obj_i) continue; // Skipping current object
@@ -64,6 +70,7 @@ RGB cast_ray(const Ray &ray, const std::vector<Sphere> &objects,
         if (shade_flag) continue; // If in shade skipping brightness calculation
 
         float angle_of_incidence = get_angle(norm, vector_of_incidence);
+        printf("Angle: %.4f\n", angle_of_incidence);
         if (angle_of_incidence > 0) {
             // Calculating deffuse brightness
             if (intersected_obj.get_stype() == OPAQUE ) brightness += angle_of_incidence * light.intensity * intersected_obj.get_deffuse_coef();
@@ -75,15 +82,19 @@ RGB cast_ray(const Ray &ray, const std::vector<Sphere> &objects,
             // Calculating a glare ---  K * (n * to_camera)^p
             brightness += light.intensity * intersected_obj.get_mirror_coef() * std::pow(angle_of_reflection, intersected_obj.get_shininess());
         }
+        printf("Brightness: %.4f\n", brightness);
     }
-
+    // if (brightness == 0.0) {
+    //     printf("No brightness\n");
+    //     return get_color(BLACK);
+    // }
     
     // Getting the color of the point
     RGB result = get_color();
     if (intersected_obj.get_stype() == OPAQUE) {
         result = intersected_obj.get_color() * brightness;
 
-    } else {       // if MIRROR or
+    } else {       // if MIRROR or TRANSPARENT
         Vector reflect_dir = *ray.direction - 2 * (*ray.direction * norm) * norm;
         Ray reflected_ray(intersection_point, reflect_dir.normalize());
         RGB reflection_result = cast_ray(reflected_ray, objects, lights, depth + 1);
@@ -144,7 +155,7 @@ char * get_png_data(const std::vector<std::vector<RGB> > &pix, const int &w, con
 }
 
 
-void render (const std::vector<Sphere> &objects, const std::vector<Light> &lights,
+void render (const std::vector<Polygon> &objects, const std::vector<Light> &lights,
              const int &w = width, const int &h = height) {
     auto start_time = std::chrono::steady_clock::now();
     // pix - pixel matrix for picture generation
@@ -173,7 +184,7 @@ void render (const std::vector<Sphere> &objects, const std::vector<Light> &light
 }
 
 // Loads .obj file
-void load_object(const std::string &file_name, const Point &pos, std::vector<Polygon> *arr) {
+void load_object(const std::string &file_name, const Point &pos, const int &scale, std::vector<Polygon> *arr) {
     std::ifstream ifs("obj/" + file_name);
     std::vector<Point> points;
     points.push_back(Point(0, 0, 0));
@@ -181,13 +192,17 @@ void load_object(const std::string &file_name, const Point &pos, std::vector<Pol
     float x, y, z;
     while (ifs >> mode && mode == 'v') {
         ifs >> x >> y >> z;
-        points.push_back(Point(x, y, z) + pos);
+        points.push_back(scale * Point(x, y, z) + pos);
     }
 
     int i1, i2, i3;
     while (!ifs.eof() && mode == 'f') {
         ifs >> i1 >> i2 >> i3;
-        arr->push_back(Polygon(pos, get_material(PLASTIC, RED), points[i1], points[i2], points[i3]));
+        Point p1 = points[i1], p2 = points[i2], p3 = points[i3];
+
+        Point poly_center = (p1 + p2 + p3) / 3;
+        Vector to_center = Vector(pos, poly_center);
+        arr->push_back(Polygon(poly_center, get_material(PLASTIC, RED), p1, p2, p3));
         ifs >> mode;
     }
 }
@@ -206,7 +221,6 @@ int main (int argc, char **argv) {
         } else if (strcmp(argv[i], "-threads") == 0) {
             threads_num = atoi(argv[i + 1]);
         } else {
-            std::cout << "Unknown flag: " << argv[i] << std::endl;
             continue;
         }
     }
@@ -216,23 +230,26 @@ int main (int argc, char **argv) {
     std::vector<Light> lights;
 
     // Adding lights
-    lights.push_back(Light(Point( 3 * width/4, 0, -100), 0.5));
-    lights.push_back(Light(Point(width/5, 0, 100), 0.5));
-    lights.push_back(Light(Point(width/2, height/2, -200), 0.25));
+    // lights.push_back(Light(Point( 3 * width/4, 0, -100), 0.5));
+    // lights.push_back(Light(Point(width/5, 0, 100), 0.5));
+    lights.push_back(Light(Point(width/2, height/2, -200), 1));
+    // lights.push_back(Light(Point(width/2, height/2, 0), 0.5));
 
     // Adding objects
-    objects.push_back(Sphere(300, Point(300, 540, 900), get_material(PLASTIC, RED)));    // Red
-    objects.push_back(Sphere(150, Point(1400, 800, 600), get_material(PLASTIC, PURPLE))); // Purple
-    objects.push_back(Sphere(200, Point(700, 600, 400), get_material(GLASS)));  // transparent
-    objects.push_back(Sphere(200, Point(width/2, -200, 1100), get_material(METAL))); // mirror
-    objects.push_back(Sphere(300, Point(1700, 400, 500), get_material(PLASTIC, BLUE))); // Blue 2
+    // objects.push_back(Sphere(300, Point(300, 540, 900), get_material(PLASTIC, RED)));    // Red
+    // objects.push_back(Sphere(150, Point(1400, 800, 600), get_material(PLASTIC, PURPLE))); // Purple
+    // objects.push_back(Sphere(200, Point(700, 600, 400), get_material(GLASS)));  // transparent
+    // objects.push_back(Sphere(200, Point(width/2, -200, 1100), get_material(METAL))); // mirror
+    // objects.push_back(Sphere(300, Point(1700, 400, 500), get_material(PLASTIC, BLUE))); // Blue 2
 
     // Loading objects
-    // load_object("duck.obj", Point(width/2, height/2, width/2), &polygons);
-    // std::cout << polygons.size() << std::endl;
+    load_object("duck.obj", Point(width/2, height/2, width/2), 75, &polygons);
+    std::cout << polygons.size() << std::endl;
+
+    //polygons.push_back(Polygon(Point(w/2, h/2, 200), get_material(PLASTIC, PURPLE), Vector()))
 
     // Start rendering
-    render(objects, lights, 1920, 1080);
+    render(polygons, lights, 1920, 1080);
     std::cout << "Ready!" << std::endl;
 
     return 0;
