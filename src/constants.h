@@ -22,7 +22,6 @@ enum Materials {
 
 enum SurfaceType { OPAQUE, MIRROR, TRANSPARENT};
 enum IntersectionType { ABSORPTION, REFLECTION, REFLECTION_AND_REFRACTION};
-enum Type { OBJECT, SPHERE, POLYGON};
 
 
 const int width = 1920;

@@ -2,7 +2,6 @@
 #define OBJECTS_H
 
 #include <iostream>
-#include <vector>
 
 
 class Sphere;
@@ -17,11 +16,11 @@ class Material;
 
 #include "constants.h"
 
+
 class Object {
     public:
         Point *position;
         Material *material;
-        Type type;
 
         Object(const Point &pos, const Material &m);
 
@@ -33,7 +32,6 @@ class Object {
         float get_mirror_coef() const;
         float get_shininess() const;
         float get_refractive_index() const;
-        Type get_type() const;
         
         // Returns an intersection point of ray and current object
         virtual Point ray_intersection(const Ray &ray) const;
