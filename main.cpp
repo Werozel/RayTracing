@@ -27,24 +27,25 @@ inline bool instanceof(const T *ptr) {
 }
 
 
-RGB cast_ray(const Ray &ray, const std::vector<Polygon> &objects, 
+RGB cast_ray(const Ray &ray, 
+             const std::vector<Sphere> &spheres, const std::vector <Polygon> &polygons,
              const std::vector<Light> &lights, const int &depth = 0) {
-    if (objects.size() == 0) return get_color();
+    if (spheres.size() == 0) return get_color();
     if (depth == recursion_gap) return get_color();
 
     Point intersection_point = no_intersection;
     float min_dist = std::numeric_limits<float>::max();
-    Polygon intersected_obj(objects[0]);
+    Object intersected_obj = spheres[0];
     int obj_i = 0;
-    for (int i = 0; i < objects.size(); i++) {
+    for (int i = 0; i < spheres.size(); i++) {
         // Returns Point(-1, -1, -1) if no intersection detected
-        Point curr_intersection = objects[i].ray_intersection(ray); // Intersection point of ray
+        Point curr_intersection = spheres[i].ray_intersection(ray); // Intersection point of ray
         if (curr_intersection != no_intersection) {
             float curr_distance = distance(curr_intersection, *ray.start);
             if (curr_distance < min_dist) {
                 min_dist = curr_distance;
                 intersection_point = curr_intersection;
-                intersected_obj = objects[i];
+                intersected_obj = spheres[i];
                 obj_i = i;
             }
         }
@@ -65,9 +66,9 @@ RGB cast_ray(const Ray &ray, const std::vector<Polygon> &objects,
 
         Ray to_light(intersection_point, vector_of_incidence);
         bool shade_flag = false; // Flag indicating if point is in shade for current light
-        for (int j = 0; j < objects.size(); j++) {
+        for (int j = 0; j < spheres.size(); j++) {
             if (j == obj_i) continue; // Skipping current object
-            if (objects[j].ray_intersection(to_light) != no_intersection) {
+            if (spheres[j].ray_intersection(to_light) != no_intersection) {
                 shade_flag = true;
                 break;
             }
@@ -87,10 +88,9 @@ RGB cast_ray(const Ray &ray, const std::vector<Polygon> &objects,
             brightness += light.intensity * intersected_obj.get_mirror_coef() * std::pow(angle_of_reflection, intersected_obj.get_shininess());
         }
     }
-    // if (brightness == 0.0) {
-    //     printf("No brightness\n");
-    //     return get_color(BLACK);
-    // }
+    if (brightness == 0.0) {
+        return get_color(BLACK);
+    }
     
     // Getting the color of the point
     RGB result = get_color();
@@ -100,7 +100,7 @@ RGB cast_ray(const Ray &ray, const std::vector<Polygon> &objects,
     } else {       // if MIRROR or TRANSPARENT
         Vector reflect_dir = *ray.direction - 2 * (*ray.direction * norm) * norm;
         Ray reflected_ray(intersection_point, reflect_dir.normalize());
-        RGB reflection_result = cast_ray(reflected_ray, objects, lights, depth + 1);
+        RGB reflection_result = cast_ray(reflected_ray, spheres, polygons, lights, depth + 1);
 
         RGB refraction_result(0, 0, 0);
 
@@ -126,7 +126,7 @@ RGB cast_ray(const Ray &ray, const std::vector<Polygon> &objects,
             Ray refraction_ray(refract_start, refract_dir.normalize());
 
             // Casting refraction ray
-            refraction_result = cast_ray(refraction_ray, objects, lights, depth + 1) * 0.8;
+            refraction_result = cast_ray(refraction_ray, spheres, polygons, lights, depth + 1) * 0.8;
         } else {
             reflection_result = reflection_result * 0.9;
         }
@@ -157,7 +157,8 @@ char * get_png_data(const std::vector<std::vector<RGB> > &pix, const int &w, con
 }
 
 
-void render (const std::vector<Polygon> &objects, const std::vector<Light> &lights,
+void render (const std::vector<Sphere> &spheres, const std::vector<Polygon> &polygons, 
+             const std::vector<Light> &lights,
              const int &w = width, const int &h = height) {
     auto start_time = std::chrono::steady_clock::now();
     // pix - pixel matrix for picture generation
@@ -169,7 +170,7 @@ void render (const std::vector<Polygon> &objects, const std::vector<Light> &ligh
             Point start = Point(w/2, h/2, -w/2);    // Point of view
             Vector direction = Vector(start, Point(j, i, 0)).normalize();   //current ray direction
             Ray ray = Ray(start, direction);
-            pix[i][j] = cast_ray(ray, objects, lights);
+            pix[i][j] = cast_ray(ray, spheres, polygons, lights);
         }
     }
     #pragma omp barrier
@@ -227,7 +228,7 @@ int main (int argc, char **argv) {
         }
     }
 
-    std::vector<Sphere> objects;
+    std::vector<Sphere> spheres;
     std::vector<Polygon> polygons;
     std::vector<Light> lights;
 
@@ -237,20 +238,18 @@ int main (int argc, char **argv) {
     lights.push_back(Light(Point(width/2, height/2, -200), 0.25));
 
     // Adding objects
-    // objects.push_back(Sphere(300, Point(300, 540, 900), get_material(PLASTIC, RED)));    // Red
-    // objects.push_back(Sphere(150, Point(1400, 800, 600), get_material(PLASTIC, PURPLE))); // Purple
-    // objects.push_back(Sphere(200, Point(700, 600, 400), get_material(GLASS)));  // transparent
-    // objects.push_back(Sphere(200, Point(width/2, -200, 1100), get_material(METAL))); // mirror
-    // objects.push_back(Sphere(300, Point(1700, 400, 500), get_material(PLASTIC, BLUE))); // Blue 2
+    spheres.push_back(Sphere(300, Point(300, 540, 900), get_material(PLASTIC, RED)));    // Red
+    spheres.push_back(Sphere(150, Point(1400, 800, 600), get_material(PLASTIC, PURPLE))); // Purple
+    spheres.push_back(Sphere(200, Point(700, 600, 400), get_material(GLASS)));  // transparent
+    spheres.push_back(Sphere(200, Point(width/2, -200, 1100), get_material(METAL))); // mirror
+    spheres.push_back(Sphere(300, Point(1700, 400, 500), get_material(PLASTIC, BLUE))); // Blue 2
 
     // Loading objects
     load_object("duck.obj", Point(width/4, height/2, width), get_material(PLASTIC, PURPLE), 100, &polygons);
     std::cout << polygons.size() << std::endl;
 
-    //polygons.push_back(Polygon(Point(w/2, h/2, 200), get_material(PLASTIC, PURPLE), Vector()))
-
     // Start rendering
-    render(polygons, lights, 1920, 1080);
+    render(spheres, polygons, lights, 1920, 1080);
     std::cout << "Ready!" << std::endl;
 
     return 0;
