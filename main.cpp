@@ -26,16 +26,14 @@ inline bool instanceof(const T *ptr) {
     return dynamic_cast<const Base*>(ptr) != nullptr;
 }
 
-
-RGB cast_ray(const Ray &ray, 
-             const std::vector<Sphere> &spheres, const std::vector <Polygon> &polygons,
+RGB cast_ray(const Ray &ray, const std::vector<Sphere> &spheres, const std::vector<Polygon> &polygons,
              const std::vector<Light> &lights, const int &depth = 0) {
     if (spheres.size() == 0) return get_color();
     if (depth == recursion_gap) return get_color();
 
     Point intersection_point = no_intersection;
     float min_dist = std::numeric_limits<float>::max();
-    Object intersected_obj = spheres[0];
+    Sphere intersected_obj = spheres[0];
     int obj_i = 0;
     for (int i = 0; i < spheres.size(); i++) {
         // Returns Point(-1, -1, -1) if no intersection detected
@@ -74,10 +72,9 @@ RGB cast_ray(const Ray &ray,
                 break;
             }
         }
-        if (shade_flag) continue; // If in shade skipping brightness calculation
+        if (shade_flag && !instanceof<Polygon>(&intersected_obj)) continue; // If in shade skipping brightness calculation
 
         float angle_of_incidence = get_angle(norm, vector_of_incidence);
-        printf("Angle: %.4f\n", angle_of_incidence);
         if (angle_of_incidence > 0) {
             // Calculating deffuse brightness
             if (intersected_obj.get_stype() == OPAQUE ) brightness += angle_of_incidence * light.intensity * intersected_obj.get_deffuse_coef();
@@ -89,7 +86,6 @@ RGB cast_ray(const Ray &ray,
             // Calculating a glare ---  K * (n * to_camera)^p
             brightness += light.intensity * intersected_obj.get_mirror_coef() * std::pow(angle_of_reflection, intersected_obj.get_shininess());
         }
-        printf("Brightness: %.4f\n", brightness);
     }
     // if (brightness == 0.0) {
     //     return get_color(BLACK);
@@ -161,7 +157,7 @@ char * get_png_data(const std::vector<std::vector<RGB> > &pix, const int &w, con
 }
 
 
-void render (const std::vector<Sphere> &spheres, const std::vector<Polygon> &polygons, 
+void render (const std::vector<Sphere> &spheres, const std::vector<Polygon> &polygons,
              const std::vector<Light> &lights,
              const int &w = width, const int &h = height) {
     auto start_time = std::chrono::steady_clock::now();
@@ -237,9 +233,9 @@ int main (int argc, char **argv) {
     std::vector<Light> lights;
 
     // Adding lights
-    // lights.push_back(Light(Point( 3 * width/4, 0, -100), 0.5));
-    // lights.push_back(Light(Point(width/5, 0, 100), 0.5));
-    lights.push_back(Light(Point(width/2, height/2, -200), 1));
+    lights.push_back(Light(Point( 3 * width/4, 0, -100), 0.5));
+    lights.push_back(Light(Point(width/5, 0, 100), 0.5));
+    lights.push_back(Light(Point(width/2, height/2, -200), 0.25));
     // lights.push_back(Light(Point(width/2, height/2, 0), 0.5));
 
     // Adding objects
