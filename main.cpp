@@ -21,6 +21,12 @@ int scene_number = 1;
 const Point no_intersection(-1, -1, -1);
 
 
+template<typename Base, typename T>
+inline bool instanceof(const T *ptr) {
+    return dynamic_cast<const Base*>(ptr) != nullptr;
+}
+
+
 RGB cast_ray(const Ray &ray, const std::vector<Polygon> &objects, 
              const std::vector<Light> &lights, const int &depth = 0) {
     if (objects.size() == 0) return get_color();
@@ -47,18 +53,17 @@ RGB cast_ray(const Ray &ray, const std::vector<Polygon> &objects,
     if (intersection_point == no_intersection)  { return get_color();}
 
     Vector norm = intersected_obj.get_norm(intersection_point);
-    // printf("Norm: %.4f %.4f %.4f\n", norm.get_x(), norm.get_y(), norm.get_z());
     
     // Calculating brightness
     float brightness = 0; // Brightnesss of intersection point
     for (auto light: lights) {
         Vector vector_of_incidence = Vector(intersection_point, light.get_position()).normalize(); // To light direction
         
-        // Point to_light_start = vector_of_incidence*norm < 0 ? intersection_point - norm * 0.1 : 
+        // Point to_light_start = vector_of_incidence * norm < 0 ? intersection_point - norm * 0.1 : 
         //                                                 intersection_point + norm * 0.1;
-        Point to_light_start = intersection_point - norm * 0.1;
+        // Point to_light_start = intersection_point - norm * 0.1;
 
-        Ray to_light(to_light_start, vector_of_incidence);
+        Ray to_light(intersection_point, vector_of_incidence);
         bool shade_flag = false; // Flag indicating if point is in shade for current light
         for (int j = 0; j < objects.size(); j++) {
             if (j == obj_i) continue; // Skipping current object
@@ -67,10 +72,9 @@ RGB cast_ray(const Ray &ray, const std::vector<Polygon> &objects,
                 break;
             }
         }
-        if (shade_flag) continue; // If in shade skipping brightness calculation
+        if (shade_flag && !instanceof<Polygon>(&intersected_obj)) continue; // If in shade skipping brightness calculation
 
         float angle_of_incidence = get_angle(norm, vector_of_incidence);
-        printf("Angle: %.4f\n", angle_of_incidence);
         if (angle_of_incidence > 0) {
             // Calculating deffuse brightness
             if (intersected_obj.get_stype() == OPAQUE ) brightness += angle_of_incidence * light.intensity * intersected_obj.get_deffuse_coef();
@@ -82,7 +86,6 @@ RGB cast_ray(const Ray &ray, const std::vector<Polygon> &objects,
             // Calculating a glare ---  K * (n * to_camera)^p
             brightness += light.intensity * intersected_obj.get_mirror_coef() * std::pow(angle_of_reflection, intersected_obj.get_shininess());
         }
-        printf("Brightness: %.4f\n", brightness);
     }
     // if (brightness == 0.0) {
     //     printf("No brightness\n");
@@ -130,7 +133,6 @@ RGB cast_ray(const Ray &ray, const std::vector<Polygon> &objects,
 
         RGB glare = get_color(WHITE) * brightness * intersected_obj.get_mirror_coef();
         result = (reflection_result + refraction_result) * 0.9 + glare;
-
     }
 
     return result;
@@ -184,7 +186,7 @@ void render (const std::vector<Polygon> &objects, const std::vector<Light> &ligh
 }
 
 // Loads .obj file
-void load_object(const std::string &file_name, const Point &pos, const int &scale, std::vector<Polygon> *arr) {
+void load_object(const std::string &file_name, const Point &pos, const Material &m, const int &scale, std::vector<Polygon> *arr) {
     std::ifstream ifs("obj/" + file_name);
     std::vector<Point> points;
     points.push_back(Point(0, 0, 0));
@@ -192,7 +194,7 @@ void load_object(const std::string &file_name, const Point &pos, const int &scal
     float x, y, z;
     while (ifs >> mode && mode == 'v') {
         ifs >> x >> y >> z;
-        points.push_back(scale * Point(x, y, z) + pos);
+        points.push_back(scale * Point(-x, -y, z) + pos);
     }
 
     int i1, i2, i3;
@@ -202,7 +204,7 @@ void load_object(const std::string &file_name, const Point &pos, const int &scal
 
         Point poly_center = (p1 + p2 + p3) / 3;
         Vector to_center = Vector(pos, poly_center);
-        arr->push_back(Polygon(poly_center, get_material(PLASTIC, RED), p1, p2, p3));
+        arr->push_back(Polygon(poly_center, m, p1, p2, p3));
         ifs >> mode;
     }
 }
@@ -230,10 +232,9 @@ int main (int argc, char **argv) {
     std::vector<Light> lights;
 
     // Adding lights
-    // lights.push_back(Light(Point( 3 * width/4, 0, -100), 0.5));
-    // lights.push_back(Light(Point(width/5, 0, 100), 0.5));
-    lights.push_back(Light(Point(width/2, height/2, -200), 1));
-    // lights.push_back(Light(Point(width/2, height/2, 0), 0.5));
+    lights.push_back(Light(Point( 3 * width/4, 0, -100), 0.5));
+    lights.push_back(Light(Point(width/5, 0, 100), 0.5));
+    lights.push_back(Light(Point(width/2, height/2, -200), 0.25));
 
     // Adding objects
     // objects.push_back(Sphere(300, Point(300, 540, 900), get_material(PLASTIC, RED)));    // Red
@@ -243,7 +244,7 @@ int main (int argc, char **argv) {
     // objects.push_back(Sphere(300, Point(1700, 400, 500), get_material(PLASTIC, BLUE))); // Blue 2
 
     // Loading objects
-    load_object("duck.obj", Point(width/2, height/2, width/2), 75, &polygons);
+    load_object("duck.obj", Point(width/4, height/2, width), get_material(PLASTIC, PURPLE), 100, &polygons);
     std::cout << polygons.size() << std::endl;
 
     //polygons.push_back(Polygon(Point(w/2, h/2, 200), get_material(PLASTIC, PURPLE), Vector()))

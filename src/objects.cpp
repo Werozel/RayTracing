@@ -3,7 +3,7 @@
 #include "materials.h"
 
 
-Object::Object(const Point &pos, const Material &m)
+Object::Object(const Point &pos, const Material &m): type(OBJECT)
     {position = new Point(pos);  material = new Material(m);}
 
 Point Object::get_position() const { return *position;}
@@ -14,6 +14,7 @@ float Object::get_deffuse_coef() const { return material->get_deffuse_coef();}
 float Object::get_mirror_coef() const { return material->get_mirror_coef();}
 float Object::get_shininess() const { return material->get_shininess();}
 float Object::get_refractive_index() const { return material->get_refractive_index();}
+Type Object::get_type() const { return type;}
 
 Object::~Object () {delete position; delete material;}
 
@@ -30,7 +31,7 @@ Vector Object::get_norm(const Point &p) const {
 // --------------------- Sphere --------------------------
 Sphere::Sphere (const Sphere &s): 
     Object(s.get_position(), s.get_material()), 
-    radius(s.get_radius()) {}
+    radius(s.get_radius()) { type = SPHERE;}
 
 void Sphere::operator= (const Sphere &s) {
     position = new Point(s.get_position());
@@ -61,7 +62,7 @@ Vector Sphere::get_norm(const Point &p) const {
 
 // ----------------------- Polygon ---------------------------
 Polygon::Polygon (const Point &pos, const Material &m, const Point &p1_t, const Point &p2_t, const Point &p3_t):
-    Object(pos, m), p1(new Point(p1_t)), p2(new Point (p2_t)), p3(new Point(p3_t)) {}
+    Object(pos, m), p1(new Point(p1_t)), p2(new Point (p2_t)), p3(new Point(p3_t)) { type = POLYGON;}
 
 Polygon::Polygon (const Polygon &p): Object(p.get_position(), p.get_material()), 
     p1(new Point(p.get_p1())), p2(new Point(p.get_p2())), p3(new Point(p.get_p3())) {}
