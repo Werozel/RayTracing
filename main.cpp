@@ -91,9 +91,9 @@ RGB cast_ray(const Ray &ray,
         }
         printf("Brightness: %.4f\n", brightness);
     }
-    if (brightness == 0.0) {
-        return get_color(BLACK);
-    }
+    // if (brightness == 0.0) {
+    //     return get_color(BLACK);
+    // }
     
     // Getting the color of the point
     RGB result = get_color();
