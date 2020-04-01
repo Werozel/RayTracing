@@ -39,7 +39,7 @@ RGB cast_ray(const Ray &ray, const std::vector<Object *> &objects,
         // Returns Point(-1, -1, -1) if no intersection detected
         Point curr_intersection = objects[i]->ray_intersection(ray); // Intersection point of ray
         if (curr_intersection != no_intersection) {
-            float curr_distance = distance(curr_intersection, *ray.start);
+            float curr_distance = distance(&curr_intersection, ray.get_start());
             if (curr_distance < min_dist) {
                 min_dist = curr_distance;
                 intersection_point = curr_intersection;
@@ -69,7 +69,7 @@ RGB cast_ray(const Ray &ray, const std::vector<Object *> &objects,
         }
         if (shade_flag && !instanceof<Polygon>(intersected_obj)) continue; // If in shade skipping brightness calculation
 
-        float angle_of_incidence = get_angle(norm, vector_of_incidence);
+        float angle_of_incidence = get_angle(&norm, &vector_of_incidence);
         if (angle_of_incidence > 0) {
             // Calculating deffuse brightness
             if (intersected_obj->get_stype() == OPAQUE ) brightness += angle_of_incidence * light.intensity * intersected_obj->get_deffuse_coef();
@@ -77,7 +77,7 @@ RGB cast_ray(const Ray &ray, const std::vector<Object *> &objects,
             // Calculating glare brightness
             // Direction to camera from intersection point
             Vector to_camera = 2 * (vector_of_incidence * norm) * norm - vector_of_incidence;
-            float angle_of_reflection = get_angle(norm, to_camera);
+            float angle_of_reflection = get_angle(&norm, &to_camera);
             // Calculating a glare ---  K * (n * to_camera)^p
             brightness += light.intensity * intersected_obj->get_mirror_coef() * std::pow(angle_of_reflection, intersected_obj->get_shininess());
         }
@@ -89,7 +89,7 @@ RGB cast_ray(const Ray &ray, const std::vector<Object *> &objects,
     // Getting the color of the point
     RGB result = get_color();
     if (intersected_obj->get_stype() == OPAQUE) {
-        result = intersected_obj->get_color() * brightness;
+        result = *intersected_obj->get_color() * brightness;
 
     } else {       // if MIRROR or TRANSPARENT
         Vector reflect_dir = *ray.direction - 2 * (*ray.direction * norm) * norm;
@@ -102,7 +102,8 @@ RGB cast_ray(const Ray &ray, const std::vector<Object *> &objects,
             reflection_result = reflection_result * 0.2;        
 
             Vector tmp_norm = norm;  // For calculating an angle between norm and ray direction
-            float angle_of_incidence = get_angle(-tmp_norm, *ray.direction); // Angle of incidence of current ray
+            Vector back_norm = -tmp_norm;
+            float angle_of_incidence = get_angle(&back_norm, ray.get_direction()); // Angle of incidence of current ray
             float n1 = 1; 
             float n2 = intersected_obj->get_refractive_index();
             if (angle_of_incidence < 0) {   // If ray is inside the object reverse the layout
@@ -231,7 +232,6 @@ int main (int argc, char **argv) {
     lights.push_back(Light(Point( 3 * width/4, 0, -100), 0.5));
     lights.push_back(Light(Point(width/5, 0, 100), 0.5));
     lights.push_back(Light(Point(width/2, height/2, -200), 0.25));
-    // lights.push_back(Light(Point(width/2, height/2, 0), 0.5));
 
     // Adding objects
     objects.push_back(new Sphere(300, Point(300, 540, 900), get_material(PLASTIC, RED)));    // Red

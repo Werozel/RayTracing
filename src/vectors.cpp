@@ -4,18 +4,18 @@
 #include <cmath>
 
 
-float distance(const Point &p1, const Point &p2) {
-    float x = p1.get_x() - p2.get_x();
-    float y = p1.get_y() - p2.get_y();
-    float z = p1.get_z() - p2.get_z();
+float distance(const Point *p1, const Point *p2) {
+    float x = p1->get_x() - p2->get_x();
+    float y = p1->get_y() - p2->get_y();
+    float z = p1->get_z() - p2->get_z();
     return sqrt(x*x + y*y + z*z);
 }
 
-float get_angle(const Vector &v1, const Vector &v2) {
-    return v1 * v2 / v1.get_length() / v2.get_length();
+float get_angle(const Vector *v1, const Vector *v2) {
+    return *v1 * *v2 / v1->get_length() / v2->get_length();
 }
 
-float get_angle_sin(const Vector &v1, const Vector &v2) {
+float get_angle_sin(const Vector *v1, const Vector *v2) {
     float cos = get_angle(v1, v2);
     return std::sqrt(1 - cos * cos);
 }
@@ -23,10 +23,10 @@ float get_angle_sin(const float &cos) {
     return std::sqrt(1 - cos*cos);
 }
 
-Vector cross_prod(const Vector &v1, const Vector &v2) {
-    float x1 = v1.get_x(), x2 = v2.get_x();
-    float y1 = v1.get_y(), y2 = v2.get_y();
-    float z1 = v1.get_z(), z2 = v2.get_z();
+Vector cross_prod(const Vector *v1, const Vector *v2) {
+    float x1 = v1->get_x(), x2 = v2->get_x();
+    float y1 = v1->get_y(), y2 = v2->get_y();
+    float z1 = v1->get_z(), z2 = v2->get_z();
     return Vector(y1 * z2 - z1 * y2, z1 * x2 - x1 * z2, x1 * y2 - y1 * x2);
 }
 
