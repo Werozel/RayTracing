@@ -247,5 +247,9 @@ int main (int argc, char **argv) {
     render(objects, lights, 1920, 1080);
     std::cout << "Ready!" << std::endl;
 
+    for (int i = 0; i < objects.size(); i++) {
+        delete objects[i];
+    }
+
     return 0;
 }
