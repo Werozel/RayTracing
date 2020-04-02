@@ -27,7 +27,6 @@ enum IntersectionType { ABSORPTION, REFLECTION, REFLECTION_AND_REFRACTION};
 const int width = 1920;
 const int height = 1080;
 
-const float fov = 90;
-const int recursion_gap = 5;
+const int recursion_gap = 4;
 
 #endif

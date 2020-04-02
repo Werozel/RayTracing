@@ -1,6 +1,7 @@
 rt
 .vscode
 result.*
+res.*
 *.o
 build
 a.out

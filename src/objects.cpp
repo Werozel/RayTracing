@@ -93,13 +93,7 @@ void Polygon::operator= (const Polygon &p) {
 }
 
 Point Polygon::ray_intersection(const Ray &ray) const {
-    // Point ray_start = ray.get_start();
-    // Vector D = ray.get_direction();
     // Checks if current ray direction is towards the object
-    if (distance(ray.get_start(), *position) < 
-        distance(ray.get_start() + ray.get_direction().normalize(), *position)) {
-        return Point(-1, -1, -1);
-    }
     Vector E1(*p1, *p2), E2(*p1, *p3);
     Vector T(*p1, ray.get_start());
     Vector P(cross_prod(ray.get_direction(), E2));
@@ -111,7 +105,7 @@ Point Polygon::ray_intersection(const Ray &ray) const {
     float v = Q * ray.get_direction() / z;
     float k = 1 - u - v;
     
-    if (k >= 0 && u >= 0 && v >= 0) {
+    if (k >= 0 && u >= 0 && v >= 0 && t > 0) {
         // return Point(k * *p2 + u * *p3 + v * *p1);
         return Point(ray.get_start() + t * ray.get_direction());
     } else {

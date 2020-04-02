@@ -79,7 +79,7 @@ RGB cast_ray(const Ray &ray, const std::vector<Object *> &objects,
             Vector to_camera = 2 * (vector_of_incidence * norm) * norm - vector_of_incidence;
             float angle_of_reflection = get_angle(norm, to_camera);
             // Calculating a glare ---  K * (n * to_camera)^p
-            brightness += light.intensity * intersected_obj->get_mirror_coef() * std::pow(angle_of_reflection, intersected_obj->get_shininess());
+            brightness += light.intensity * 0.33 * intersected_obj->get_mirror_coef() * std::pow(angle_of_reflection, intersected_obj->get_shininess());
         }
     }
     
@@ -200,7 +200,8 @@ void render (const std::vector<Object *> &objects,
 }
 
 // Loads .obj file
-void load_object(const std::string &file_name, const Point &pos, const Material &m, const int &scale, std::vector<Object *> *arr) {
+void load_object(const std::string &file_name, const Point &pos, 
+                 const Material &m, const int &scale, std::vector<Object *> *arr) {
     std::ifstream ifs("obj/" + file_name);
     std::vector<Point> points;
     points.push_back(Point(0, 0, 0));
@@ -254,14 +255,14 @@ int main (int argc, char **argv) {
     lights.push_back(Light(Point(width/2, height/2, -200), 0.25));
 
     // Adding objects
-    objects.push_back(new Sphere(300, Point(300, 540, 900), get_material(PLASTIC, RED)));    // Red
-    objects.push_back(new Sphere(150, Point(1400, 800, 600), get_material(PLASTIC, BLUE))); // Purple
-    objects.push_back(new Sphere(200, Point(700, 600, 400), get_material(GLASS)));  // transparent
+    objects.push_back(new Sphere(300, Point(100, 540, 900), get_material(PLASTIC, RED)));    // Red
+    objects.push_back(new Sphere(150, Point(1200, 800, 600), get_material(PLASTIC, BLUE))); // Purple
+    objects.push_back(new Sphere(200, Point(500, 600, 400), get_material(GLASS)));  // transparent
     // objects.push_back(new Sphere(200, Point(width/2, -200, 1100), get_material(METAL))); // mirror
-    objects.push_back(new Sphere(300, Point(1700, 400, 500), get_material(METAL, BLUE))); // Blue 2
+    objects.push_back(new Sphere(300, Point(1500, 400, 500), get_material(METAL, BLUE))); // Blue 2
 
     // Loading objects
-    load_object("duck.obj", Point(width * 0.75, 2 * height * 0.2, width * 0.3), get_material(PLASTIC, PURPLE), 60, &objects);
+    load_object("duck.obj", Point(width * 0.75 - 100, 2 * height * 0.2, width * 0.3), get_material(PLASTIC, PURPLE), 60, &objects);
 
     // Start rendering
     std::cout << "Started" << std::endl;
