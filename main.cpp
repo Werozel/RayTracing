@@ -226,6 +226,7 @@ void load_object(const std::string &file_name, const Point &pos, const Material 
 
 int main (int argc, char **argv) {
     srand(time(NULL));
+    int smoothness = 1;
 
     strcpy(output_file, "result.png");
     for (int i = 1; i < argc - 1; i+=2) {
@@ -236,6 +237,8 @@ int main (int argc, char **argv) {
             if (scene_number < 1 || 3 < scene_number) return 0;
         } else if (strcmp(argv[i], "-threads") == 0) {
             threads_num = atoi(argv[i + 1]);
+        } else if (strcmp(argv[i], "-smooth") == 0) {
+            smoothness = atoi(argv[i + 1]);
         } else {
             continue;
         }
@@ -258,11 +261,11 @@ int main (int argc, char **argv) {
     objects.push_back(new Sphere(300, Point(1700, 400, 500), get_material(METAL, BLUE))); // Blue 2
 
     // Loading objects
-    // load_object("duck.obj", Point(width * 0.75, 2 * height * 0.2, width * 0.3), get_material(PLASTIC, PURPLE), 60, &objects);
+    load_object("duck.obj", Point(width * 0.75, 2 * height * 0.2, width * 0.3), get_material(PLASTIC, PURPLE), 60, &objects);
 
     // Start rendering
     std::cout << "Started" << std::endl;
-    render(objects, lights, 1920, 1080, 5);
+    render(objects, lights, 1920, 1080, smoothness);
     std::cout << "Ready!" << std::endl;
 
     for (int i = 0; i < objects.size(); i++) {
