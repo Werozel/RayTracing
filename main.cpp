@@ -134,17 +134,17 @@ RGB cast_ray(const Ray &ray, const std::vector<Object *> &objects,
 
 
 
-char * get_png_data(const std::vector<std::vector<RGB> > &pix, const int &w, const int &h) {
+char * get_png_data(RGB **pix, const int &w, const int &h) {
     char *result = new char[w * h * 3 + 3];
     
-    int i = 0;
+    int k = 0;
     int offset = w * h;
-    for (auto row: pix) {
-        for (auto rgb: row) {
-            result[i] = (char)rgb.get_r();
-            result[i + 1] = (char)rgb.get_g();
-            result[i + 2] = (char)rgb.get_b();
-            i += 3;
+    for (int i = 0; i < h; i++) {
+        for (int j = 0; j < w; j++) {
+            result[k] = (char)pix[i][j].get_r();
+            result[k + 1] = (char)pix[i][j].get_g();
+            result[k + 2] = (char)pix[i][j].get_b();
+            k += 3;
         }
     }
     return result;
@@ -156,20 +156,23 @@ void render (const std::vector<Object *> &objects,
              const int &w = width, const int &h = height) {
     auto start_time = std::chrono::steady_clock::now();
     // pix - pixel matrix for picture generation
-    std::vector<std::vector<RGB> > pix(h);
-    omp_set_num_threads(threads_num);
+    RGB **pix = new RGB *[h];
     for (int i = 0; i < h; i++) {
-        std::vector<RGB> row(w);
-        #pragma omp parallel for
+        pix[i] = new RGB[w];
+    }
+
+    omp_set_num_threads(threads_num);
+    #pragma omp parallel for collapse(2)
+    for (int i = 0; i < h; i++) {
         for (int j = 0; j < w; j++) {
             Point start = Point(w/2, h/2, -w/2);    // Point of view
             Vector direction = Vector(start, Point(j, i, 0)).normalize();   //current ray direction
             Ray ray = Ray(start, direction);
-            row[j] = cast_ray(ray, objects, lights);
+            pix[i][j] = cast_ray(ray, objects, lights);
         }
-        #pragma omp barrier
-        pix.push_back(row);
     }
+    #pragma omp barrier
+
 
     auto end_time = std::chrono::steady_clock::now();
     std::chrono::duration<float> calculation_time = end_time - start_time;
@@ -179,6 +182,11 @@ void render (const std::vector<Object *> &objects,
     char *picture = get_png_data(pix, w, h);
     stbi_write_png(output_file, w, h, 3, picture, w * 3);
     delete [] picture;
+
+    for (int i = 0; i < h; i++) {
+        delete [] pix[i];
+    }
+    delete [] pix;
 
 }
 
