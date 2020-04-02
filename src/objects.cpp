@@ -131,12 +131,20 @@ Polygon::~Polygon() {
 }
 
 // ----------------------- Ray -------------------------------
+Ray::Ray(): start(nullptr), direction(nullptr) {}
 Ray::Ray(const Point &start_point, const Vector &dir) 
     {start = new Point(start_point); direction = new Vector(dir.normalize());}
 
 Point & Ray::get_start() const { return *start;}
 Vector & Ray::get_direction() const { return *direction;}
 
+void Ray::operator= (const Ray &r) {
+    if (&r == this) { return;}
+    delete start;
+    delete direction;
+    start = new Point(r.get_start());
+    direction = new Vector(r.get_direction());
+}
 
 Point Ray::get_closest_point_to_point(const Point &p) const {
     Vector v = Vector(*start, p);

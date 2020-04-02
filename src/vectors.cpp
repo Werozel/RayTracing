@@ -45,6 +45,8 @@ bool Triplet::operator== (const Triplet &v) const
 
 Triplet Triplet::operator+ (const Triplet &v) const 
     { return Triplet(x + v.get_x(), y + v.get_y(), z + v.get_z());}
+void Triplet::operator+= (const Triplet &t) 
+    { x += t.get_x(); y += t.get_y(); z += t.get_z();}
 Triplet Triplet::operator- (const Triplet &v) const 
     { return Triplet(x - v.get_x(), y - v.get_y(), z - v.get_z());}
 Triplet Triplet::operator-() const { return Triplet(-x, -y, -z);}
@@ -94,17 +96,18 @@ bool RGB::operator!= (const RGB &col) const {
 }
 
 RGB RGB::operator* (const float &n) const {
-    float new_r = std::min<float>(255, n * r);
-    float new_g = std::min<float>(255, n * g);
-    float new_b = std::min<float>(255, n * b);
-    return RGB(new_r, new_g, new_b);
+    return RGB(n * r, n * g, n * b);
 }
 
 RGB RGB::operator+ (const RGB &rgb) const {
-    float new_r = std::min<float>(255, rgb.get_r() + r);
-    float new_g = std::min<float>(255, rgb.get_g() + g);
-    float new_b = std::min<float>(255, rgb.get_b() + b);
-    return RGB(new_r, new_g, new_b);
+    return RGB(rgb.get_r() + r, rgb.get_g() + g, rgb.get_b() + b);
+}
+
+void RGB::normalize() {
+    r = std::max<float>(0, std::min<float>(255, r));
+    g = std::max<float>(0, std::min<float>(255, g));
+    b = std::max<float>(0, std::min<float>(255, b));
+
 }
 
 

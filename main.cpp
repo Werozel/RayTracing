@@ -141,6 +141,7 @@ char * get_png_data(RGB **pix, const int &w, const int &h) {
     int offset = w * h;
     for (int i = 0; i < h; i++) {
         for (int j = 0; j < w; j++) {
+            pix[i][j].normalize();
             result[k] = (char)pix[i][j].get_r();
             result[k + 1] = (char)pix[i][j].get_g();
             result[k + 2] = (char)pix[i][j].get_b();
@@ -153,7 +154,8 @@ char * get_png_data(RGB **pix, const int &w, const int &h) {
 
 void render (const std::vector<Object *> &objects,
              const std::vector<Light> &lights,
-             const int &w = width, const int &h = height) {
+             const int &w = width, const int &h = height, 
+             const int &smoothness = 1) {
     auto start_time = std::chrono::steady_clock::now();
     // pix - pixel matrix for picture generation
     RGB **pix = new RGB *[h];
@@ -161,18 +163,25 @@ void render (const std::vector<Object *> &objects,
         pix[i] = new RGB[w];
     }
 
+    Point start(w/2, h/2, -w/2);
+    float k = 1.f / (float)smoothness;
+
     omp_set_num_threads(threads_num);
     #pragma omp parallel for collapse(2)
     for (int i = 0; i < h; i++) {
         for (int j = 0; j < w; j++) {
-            Point start = Point(w/2, h/2, -w/2);    // Point of view
-            Vector direction = Vector(start, Point(j, i, 0)).normalize();   //current ray direction
-            Ray ray = Ray(start, direction);
-            pix[i][j] = cast_ray(ray, objects, lights);
+            Vector direction;
+            Ray ray;
+            RGB res;   
+            for (int t = 0; t < smoothness; t++) {
+                direction = Vector(start, Point(j + k*t, i + k*t, 0)).normalize();
+                ray = Ray(start, direction);
+                res += cast_ray(ray, objects, lights);
+            }
+            pix[i][j] = res / (float)smoothness;
         }
     }
     #pragma omp barrier
-
 
     auto end_time = std::chrono::steady_clock::now();
     std::chrono::duration<float> calculation_time = end_time - start_time;
@@ -249,11 +258,11 @@ int main (int argc, char **argv) {
     objects.push_back(new Sphere(300, Point(1700, 400, 500), get_material(METAL, BLUE))); // Blue 2
 
     // Loading objects
-    load_object("duck.obj", Point(width * 0.75, 2 * height * 0.2, width * 0.3), get_material(PLASTIC, PURPLE), 60, &objects);
+    // load_object("duck.obj", Point(width * 0.75, 2 * height * 0.2, width * 0.3), get_material(PLASTIC, PURPLE), 60, &objects);
 
     // Start rendering
     std::cout << "Started" << std::endl;
-    render(objects, lights, 1920, 1080);
+    render(objects, lights, 1920, 1080, 5);
     std::cout << "Ready!" << std::endl;
 
     for (int i = 0; i < objects.size(); i++) {

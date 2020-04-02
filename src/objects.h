@@ -93,16 +93,19 @@ class Ray {
         Point *start;
         Vector *direction;
 
+        Ray();
         Ray(const Point &start_point, const Vector &dir);
 
         Point & get_start() const;
-        Vector & get_direction() const;
+        Vector & get_direction() const;         
 
         // Gets a point on a ray closest to given point
         Point get_closest_point_to_point (const Point &p) const;
 
         // Gets a point on a ray closest to given object
         Point get_closest_point_to_object (const Object &o) const;
+
+        void operator= (const Ray &r);
 
         ~Ray ();
 };

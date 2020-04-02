@@ -45,6 +45,7 @@ class Triplet {
         virtual bool operator== (const Triplet &v) const;
 
         Triplet operator+ (const Triplet &v) const;
+        void operator+= (const Triplet &t);
         Triplet operator- (const Triplet &v) const;
         Triplet operator-() const;
         float operator* (const Triplet &v) const;
@@ -99,6 +100,8 @@ class RGB: public Triplet {
 
         bool operator== (const RGB &col) const;
         bool operator!= (const RGB &col) const;
+
+        void normalize();
 
         friend std::ostream & operator<< (std::ostream &out, const RGB &v) 
             { return out << (char)v.get_r() << (char)v.get_g() << (char)v.get_b();}
