@@ -7,6 +7,8 @@ A program that implements ray-tracing rendering technique
 
 ### Run
 
+``cmake −DCMAKE_BUILD_TYPE=Release``
+
 ``make run``
 
 ``make clean``
