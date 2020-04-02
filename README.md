@@ -11,4 +11,13 @@ A program that implements ray-tracing rendering technique
 
 ``make clean``
 
-Program generates result.png
+## Flags
+
+``-threads n`` - Number of threads
+
+``-out path`` - Path to a result file
+
+``-scene n`` - Scene number
+
+``-smooth n`` - Anti-aliasing value
+
