@@ -67,7 +67,7 @@ RGB cast_ray(const Ray &ray, const std::vector<Object *> &objects,
                 break;
             }
         }
-        if (shade_flag && !instanceof<Polygon>(intersected_obj)) continue; // If in shade skipping brightness calculation
+        if (shade_flag) continue; // If in shade skipping brightness calculation
 
         float angle_of_incidence = get_angle(&norm, &vector_of_incidence);
         if (angle_of_incidence > 0) {
