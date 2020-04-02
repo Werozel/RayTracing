@@ -9,7 +9,7 @@ class RGB;
 
 class Material {
     public:
-        RGB *color;
+        RGB* color;
         float deffuse_coef;
         float mirror_coef;
         float shininess;
@@ -22,7 +22,7 @@ class Material {
                  const float &refr_index = 1);
         Material(const Material &m);
 
-        RGB* get_obj_color() const;
+        RGB & get_obj_color() const;
         float get_deffuse_coef() const;
         float get_mirror_coef() const;
         float get_shininess() const;

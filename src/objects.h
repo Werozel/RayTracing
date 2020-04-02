@@ -24,9 +24,9 @@ class Object {
 
         Object(const Point &pos, const Material &m);
 
-        Point* get_position() const;
-        Material* get_material() const;
-        RGB* get_color() const;
+        Point & get_position() const;
+        Material & get_material() const;
+        RGB get_color() const;
         SurfaceType get_stype() const;
         float get_deffuse_coef() const;
         float get_mirror_coef() const;
@@ -75,9 +75,9 @@ class Polygon: public Object {
         Vector get_v1() const;
         Vector get_v2() const;
         Vector get_v3() const;
-        Point* get_p1() const;
-        Point* get_p2() const;
-        Point* get_p3() const;
+        Point & get_p1() const;
+        Point & get_p2() const;
+        Point & get_p3() const;
 
         void operator= (const Polygon &p);
 
@@ -95,8 +95,8 @@ class Ray {
 
         Ray(const Point &start_point, const Vector &dir);
 
-        Point* get_start() const;
-        Vector* get_direction() const;
+        Point & get_start() const;
+        Vector & get_direction() const;
 
         // Gets a point on a ray closest to given point
         Point get_closest_point_to_point (const Point &p) const;

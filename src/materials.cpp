@@ -14,12 +14,12 @@ Material::Material(const SurfaceType &stype,
 
 Material::Material(const Material &m): 
     surface_type(m.get_surface_type()),
-    color(new RGB(*m.get_obj_color())), deffuse_coef(m.get_deffuse_coef()),
+    color(new RGB(m.get_obj_color())), deffuse_coef(m.get_deffuse_coef()),
     mirror_coef(m.get_mirror_coef()), shininess(m.get_shininess()), 
     refractive_index(m.get_refractive_index()) {}
 
 
-RGB* Material::get_obj_color() const { return color;}
+RGB & Material::get_obj_color() const { return *color;}
 float Material::get_deffuse_coef() const { return deffuse_coef;}
 float Material::get_mirror_coef() const { return mirror_coef;}
 float Material::get_shininess() const { return shininess;}
@@ -27,18 +27,17 @@ float Material::get_refractive_index() const { return refractive_index;}
 SurfaceType Material::get_surface_type() const { return surface_type;}
 
 void Material::operator=(const Material &m) {
+    if (&m == this) { return;}
     surface_type = m.get_surface_type();
-    color = new RGB(*m.get_obj_color());
+    delete color;
+    color = new RGB(m.get_obj_color());
     deffuse_coef = m.get_deffuse_coef();
     mirror_coef = m.get_mirror_coef();
     shininess = m.get_shininess();
     refractive_index = m.get_refractive_index();
 }
 
-
-Material::~Material() {
-    delete color;
-}
+Material::~Material() { delete color;}
 
 
 Material get_material(const Materials &m, const Colors &color) {

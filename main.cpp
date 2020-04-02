@@ -39,7 +39,7 @@ RGB cast_ray(const Ray &ray, const std::vector<Object *> &objects,
         // Returns Point(-1, -1, -1) if no intersection detected
         Point curr_intersection = objects[i]->ray_intersection(ray); // Intersection point of ray
         if (curr_intersection != no_intersection) {
-            float curr_distance = distance(&curr_intersection, ray.get_start());
+            float curr_distance = distance(curr_intersection, ray.get_start());
             if (curr_distance < min_dist) {
                 min_dist = curr_distance;
                 intersection_point = curr_intersection;
@@ -69,7 +69,7 @@ RGB cast_ray(const Ray &ray, const std::vector<Object *> &objects,
         }
         if (shade_flag) continue; // If in shade skipping brightness calculation
 
-        float angle_of_incidence = get_angle(&norm, &vector_of_incidence);
+        float angle_of_incidence = get_angle(norm, vector_of_incidence);
         if (angle_of_incidence > 0) {
             // Calculating deffuse brightness
             if (intersected_obj->get_stype() == OPAQUE ) brightness += angle_of_incidence * light.intensity * intersected_obj->get_deffuse_coef();
@@ -77,19 +77,17 @@ RGB cast_ray(const Ray &ray, const std::vector<Object *> &objects,
             // Calculating glare brightness
             // Direction to camera from intersection point
             Vector to_camera = 2 * (vector_of_incidence * norm) * norm - vector_of_incidence;
-            float angle_of_reflection = get_angle(&norm, &to_camera);
+            float angle_of_reflection = get_angle(norm, to_camera);
             // Calculating a glare ---  K * (n * to_camera)^p
             brightness += light.intensity * intersected_obj->get_mirror_coef() * std::pow(angle_of_reflection, intersected_obj->get_shininess());
         }
     }
-    // if (brightness == 0.0) {
-    //     return get_color(BLACK);
-    // }
     
     // Getting the color of the point
     RGB result = get_color();
     if (intersected_obj->get_stype() == OPAQUE) {
-        result = *intersected_obj->get_color() * brightness;
+        
+        return (brightness == 0.0) ? get_color(BLACK) : intersected_obj->get_color() * brightness;
 
     } else {       // if MIRROR or TRANSPARENT
         Vector reflect_dir = *ray.direction - 2 * (*ray.direction * norm) * norm;
@@ -102,8 +100,7 @@ RGB cast_ray(const Ray &ray, const std::vector<Object *> &objects,
             reflection_result = reflection_result * 0.2;        
 
             Vector tmp_norm = norm;  // For calculating an angle between norm and ray direction
-            Vector back_norm = -tmp_norm;
-            float angle_of_incidence = get_angle(&back_norm, ray.get_direction()); // Angle of incidence of current ray
+            float angle_of_incidence = get_angle(-tmp_norm, ray.get_direction()); // Angle of incidence of current ray
             float n1 = 1; 
             float n2 = intersected_obj->get_refractive_index();
             if (angle_of_incidence < 0) {   // If ray is inside the object reverse the layout
@@ -126,7 +123,8 @@ RGB cast_ray(const Ray &ray, const std::vector<Object *> &objects,
             reflection_result = reflection_result * 0.9;
         }
 
-        RGB glare = get_color(WHITE) * brightness * intersected_obj->get_mirror_coef();
+        RGB glare = (brightness == 0.0) ? get_color(BLACK) : 
+                        get_color(WHITE) * brightness * intersected_obj->get_mirror_coef();
         result = (reflection_result + refraction_result) * 0.9 + glare;
 
     }
@@ -158,18 +156,20 @@ void render (const std::vector<Object *> &objects,
              const int &w = width, const int &h = height) {
     auto start_time = std::chrono::steady_clock::now();
     // pix - pixel matrix for picture generation
-    std::vector<std::vector<RGB> > pix(h, std::vector<RGB>(w));
+    std::vector<std::vector<RGB> > pix(h);
     omp_set_num_threads(threads_num);
-    #pragma omp parallel for collapse(2)
     for (int i = 0; i < h; i++) {
+        std::vector<RGB> row(w);
+        #pragma omp parallel for
         for (int j = 0; j < w; j++) {
             Point start = Point(w/2, h/2, -w/2);    // Point of view
             Vector direction = Vector(start, Point(j, i, 0)).normalize();   //current ray direction
             Ray ray = Ray(start, direction);
-            pix[i][j] = cast_ray(ray, objects, lights);
+            row[j] = cast_ray(ray, objects, lights);
         }
+        #pragma omp barrier
+        pix.push_back(row);
     }
-    #pragma omp barrier
 
     auto end_time = std::chrono::steady_clock::now();
     std::chrono::duration<float> calculation_time = end_time - start_time;
@@ -244,12 +244,14 @@ int main (int argc, char **argv) {
     load_object("duck.obj", Point(width * 0.75, 2 * height * 0.2, width * 0.3), get_material(PLASTIC, PURPLE), 60, &objects);
 
     // Start rendering
+    std::cout << "Started" << std::endl;
     render(objects, lights, 1920, 1080);
     std::cout << "Ready!" << std::endl;
 
     for (int i = 0; i < objects.size(); i++) {
         delete objects[i];
     }
+    delete [] output_file;
 
     return 0;
 }
