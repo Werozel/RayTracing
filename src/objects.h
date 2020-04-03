@@ -26,7 +26,7 @@ class Object {
 
         Point & get_position() const;
         Material & get_material() const;
-        RGB get_color() const;
+        virtual RGB get_color(const Point &p) const;
         SurfaceType get_stype() const;
         float get_deffuse_coef() const;
         float get_mirror_coef() const;
@@ -108,15 +108,23 @@ class Rectangle: public Object {
 
 class SceneFloor: public Object {
     public:
+        RGB *second_color;
+        float tile_size;
 
-        SceneFloor(const Point &pos, const Material &m): Object(pos, m) {}
-        SceneFloor(const SceneFloor &f): Object(f.get_position(), f.get_material()) {}
+        SceneFloor(const Point &pos, const Material &m, const Colors &s_col = BG_COLOR, const float &pal_size = 75);
+        SceneFloor(const SceneFloor &f);
+
+        RGB get_second_color() const;
+        float get_tile_size() const;
 
         void operator= (const SceneFloor &f);
 
         Point ray_intersection(const Ray &ray) const;
         Vector get_norm(const Point &p) const;
 
+        RGB get_color(const Point &p) const;
+
+        ~SceneFloor();
 };
 
 

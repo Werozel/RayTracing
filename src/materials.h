@@ -34,7 +34,7 @@ class Material {
         ~Material();
 };
 
-RGB get_color(const Colors &color = BG_COLOR);
+RGB get_material_color(const Colors &color = BG_COLOR);
 Material get_material(const Materials &m, const Colors &color = BLACK);
 
 

@@ -9,7 +9,7 @@ Material::Material(const SurfaceType &stype,
                     const float &refr_index):
         surface_type(stype), deffuse_coef(deffuse_c), mirror_coef(mirror_c),
         shininess(shine), refractive_index(refr_index)  {
-            color = new RGB(get_color(col));
+            color = new RGB(get_material_color(col));
         }
 
 
@@ -55,7 +55,7 @@ Material get_material(const Materials &m, const Colors &color) {
     }
 }
 
-RGB get_color (const Colors &color) {
+RGB get_material_color (const Colors &color) {
         switch (color) {
         case WHITE:
             return RGB(255, 255, 255);

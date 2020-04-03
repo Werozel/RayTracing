@@ -112,7 +112,7 @@ void RGB::normalize() {
 
 
 // ------------------ Light -------------------------
-Light::Light (const Point &pos, const float &intens, const Colors &col): position(pos), intensity(intens), color(get_color(col)) {}
+Light::Light (const Point &pos, const float &intens, const Colors &col): position(pos), intensity(intens), color(get_material_color(col)) {}
 
 Point Light::get_position() const { return position;} 
 float Light::get_intensity() const { return intensity;}

@@ -28,8 +28,8 @@ inline bool instanceof(const T *ptr) {
 
 RGB cast_ray(const Ray &ray, const std::vector<Object *> &objects,
              const std::vector<Light> &lights, const int &depth = 0) {
-    if (objects.size() == 0) return get_color();
-    if (depth == recursion_gap) return get_color();
+    if (objects.size() == 0) return get_material_color();
+    if (depth == recursion_gap) return get_material_color();
 
     Point intersection_point = no_intersection;
     float min_dist = std::numeric_limits<float>::max();
@@ -49,7 +49,7 @@ RGB cast_ray(const Ray &ray, const std::vector<Object *> &objects,
         }
     }
 
-    if (intersection_point == no_intersection)  { return get_color();}
+    if (intersection_point == no_intersection)  { return get_material_color();}
 
     Vector norm = intersected_obj->get_norm(intersection_point);
     
@@ -88,10 +88,10 @@ RGB cast_ray(const Ray &ray, const std::vector<Object *> &objects,
     }
     
     // Getting the color of the point
-    RGB result = get_color();
+    RGB result = get_material_color();
     if (intersected_obj->get_stype() == OPAQUE) {
         
-        return (brightness == 0.0) ? get_color(BLACK) : intersected_obj->get_color() * brightness;
+        return (brightness == 0.0) ? get_material_color(BLACK) : intersected_obj->get_color(intersection_point) * brightness;
 
     } else {       // if MIRROR or TRANSPARENT
         Vector reflect_dir = ray.get_direction() - 2 * (ray.get_direction() * norm) * norm;
@@ -103,7 +103,7 @@ RGB cast_ray(const Ray &ray, const std::vector<Object *> &objects,
         RGB refraction_result(0, 0, 0);
 
         if (intersected_obj->get_stype() == TRANSPARENT) {
-            reflection_result = reflection_result * 0.2;        
+            reflection_result = reflection_result * 0.05;        
 
             Vector tmp_norm = norm;  // For calculating an angle between norm and ray direction
             float angle_of_incidence = get_angle(-tmp_norm, ray.get_direction()); // Angle of incidence of current ray
@@ -129,8 +129,8 @@ RGB cast_ray(const Ray &ray, const std::vector<Object *> &objects,
             reflection_result = reflection_result * 0.9;
         }
 
-        RGB glare = (brightness == 0.0) ? get_color(BLACK) : 
-                        get_color(WHITE) * brightness * intersected_obj->get_mirror_coef();
+        RGB glare = (brightness == 0.0) ? get_material_color(BLACK) : 
+                        get_material_color(WHITE) * brightness * intersected_obj->get_mirror_coef();
         result = (reflection_result + refraction_result) * 0.9 + glare;
 
     }
@@ -266,7 +266,7 @@ int main (int argc, char **argv) {
     // objects.push_back(new Sphere(200, Point(width/2, -200, 1100), get_material(METAL))); // mirror
     objects.push_back(new Sphere(300, Point(1500, 100, 500), get_material(PLASTIC, BLUE))); // Blue 2
 
-    objects.push_back(new SceneFloor(Point(width/2, height * 0.9, 0), get_material(PLASTIC, PURPLE)));
+    objects.push_back(new SceneFloor(Point(width/2, height * 0.9, 0), get_material(PLASTIC, PURPLE), WHITE, 200));
 
     // Loading objects
     load_object("duck.obj", Point(width * 0.63, 750, width * 0.3), get_material(PLASTIC, GREEN), 60, objects);

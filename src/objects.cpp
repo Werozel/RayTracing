@@ -1,6 +1,7 @@
 #include "objects.h"
 #include "vectors.h"
 #include "materials.h"
+#include <cmath>
 
 
 Object::Object(const Point &pos, const Material &m)
@@ -8,7 +9,7 @@ Object::Object(const Point &pos, const Material &m)
 
 Point & Object::get_position() const { return *position;}
 Material & Object::get_material() const { return *material;}
-RGB Object::get_color() const { return material->get_obj_color();}
+RGB Object::get_color(const Point &p) const { return material->get_obj_color();}
 SurfaceType Object::get_stype() const { return material->get_surface_type();}
 float Object::get_deffuse_coef() const { return material->get_deffuse_coef();}
 float Object::get_mirror_coef() const { return material->get_mirror_coef();}
@@ -176,12 +177,30 @@ Vector Rectangle::get_norm (const Point &p) const {
 
 // ------------------------ Floor ---------------------------
 
+SceneFloor::SceneFloor(const Point &pos, const Material &m, const Colors &s_col, const float &pal_size): 
+    Object(pos, m),
+    second_color(new RGB((s_col == BG_COLOR) ? m.get_obj_color() : get_material_color(s_col))),
+    tile_size(pal_size) {}
+
+SceneFloor::SceneFloor(const SceneFloor &f): Object(f.get_position(), f.get_material()),
+    second_color(new RGB(f.get_second_color())), tile_size(f.get_tile_size()) {}
+
 void SceneFloor::operator= (const SceneFloor &f) {
     if (&f == this) { return;}
     delete position;
     delete material;
+    delete second_color;
     position = new Point(f.get_position());
     material = new Material(f.get_material());
+    second_color = new RGB(f.get_second_color());
+    tile_size = f.get_tile_size();
+}
+
+RGB SceneFloor::get_second_color() const {
+    return *second_color;
+}
+float SceneFloor::get_tile_size() const {
+    return tile_size;
 }
 
 Point SceneFloor::ray_intersection(const Ray &ray) const {
@@ -204,6 +223,18 @@ Point SceneFloor::ray_intersection(const Ray &ray) const {
 Vector SceneFloor::get_norm(const Point &p) const {
     return Vector(0, -1, 0);
 }
+
+RGB SceneFloor::get_color(const Point &p) const {
+    int kx = (int) std::round(std::abs(p.get_x()) / tile_size) % 10;
+    int kz = (int) std::round(std::abs(p.get_z()) / tile_size) % 10;
+    if (kx % 2 xor kz % 2) {
+        return *second_color;
+    } else {
+        return material->get_obj_color();
+    }
+}
+
+SceneFloor::~SceneFloor() { delete second_color;}
 
 
 
