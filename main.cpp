@@ -124,7 +124,7 @@ RGB cast_ray(const Ray &ray, const std::vector<Object *> &objects,
             Ray refraction_ray(refract_start, refract_dir.normalize());
 
             // Casting refraction ray
-            refraction_result = cast_ray(refraction_ray, objects, lights, depth + 1) * 0.8;
+            refraction_result = cast_ray(refraction_ray, objects, lights, depth + 1) * 0.9;
         } else {
             reflection_result = reflection_result * 0.9;
         }
@@ -218,13 +218,20 @@ void load_object(const std::string &file_name, const Point &pos,
         points.push_back(scale * Point(x, -y, z) + pos);
     }
 
-    int i1, i2, i3;
+    int indexes[4];
     while (!ifs.eof() && mode == 'f') {
-        ifs >> i1 >> i2 >> i3;
-        Point p1 = points[i1], p2 = points[i2], p3 = points[i3];
+        ifs >> indexes[0] >> indexes[1] >> indexes[2];
+        Point p1 = points[indexes[0]], p2 = points[indexes[1]], p3 = points[indexes[2]];
 
-        Point poly_center = (p1 + p2 + p3) / 3;
-        arr.push_back(new Polygon(poly_center, m, p2, p1, p3));
+        if (!ifs.eof() && ifs.peek() != '\n') {
+            ifs >> indexes[3];
+            Point p4 = points[indexes[3]];
+            Point poly_center = (p1 + p2 + p3 + p4) / 4;
+            arr.push_back(new Rectangle(poly_center, m, p2, p1, p4, p3));
+        } else {
+            Point poly_center = (p1 + p2 + p3) / 3;
+            arr.push_back(new Polygon(poly_center, m, p2, p1, p3));
+        }
         ifs >> mode;
     }
     ifs.close();
@@ -260,16 +267,18 @@ int main (int argc, char **argv) {
     lights.push_back(Light(Point(width/2, height/2, -200), 0.4));
 
     // Adding objects
-    objects.push_back(new Sphere(300, Point(100, 540, 900), get_material(PLASTIC, RED)));    // Red
+    objects.push_back(new Sphere(300, Point(100, 540, 900), get_material(PLASTIC, GREEN)));    // Red
     objects.push_back(new Sphere(150, Point(1200, 800, 600), get_material(METAL, BLUE))); // Purple
-    objects.push_back(new Sphere(200, Point(500, 600, 400), get_material(GLASS)));  // transparent
+    objects.push_back(new Sphere(200, Point(500, 700, 400), get_material(GLASS)));  // transparent
     // objects.push_back(new Sphere(200, Point(width/2, -200, 1100), get_material(METAL))); // mirror
-    objects.push_back(new Sphere(300, Point(1500, 100, 500), get_material(PLASTIC, BLUE))); // Blue 2
+    objects.push_back(new Sphere(300, Point(1500, 100, 500), get_material(PLASTIC, RED))); // Blue 2
 
     objects.push_back(new SceneFloor(Point(width/2, height * 0.9, 0), get_material(PLASTIC, PURPLE), WHITE, 200));
 
     // Loading objects
-    load_object("duck.obj", Point(width * 0.63, 750, width * 0.3), get_material(PLASTIC, GREEN), 60, objects);
+    load_object("duck.obj", Point(width * 0.63, 750, width * 0.3), get_material(PLASTIC, YELLOW), 60, objects);
+    load_object("Palm_Tree.obj", Point(200, height - 200, 350), get_material(PLASTIC, WHITE), 150, objects);
+    printf("Loaded %d objects\n", (int)objects.size());
 
     // Start rendering
     std::cout << "Started" << std::endl;

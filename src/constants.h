@@ -11,7 +11,8 @@ enum Colors {
     RED,
     GREEN,
     BLUE, 
-    PURPLE
+    PURPLE,
+    YELLOW
 };
 
 enum Materials {

@@ -165,7 +165,7 @@ void Rectangle::operator= (const Rectangle &r) {
 
 Point Rectangle::ray_intersection(const Ray &ray) const {
     Point res = p1.ray_intersection(ray);
-    if (res != Point(-1, -1, -1)) {
+    if (res == Point(-1, -1, -1)) {
         return p2.ray_intersection(ray);
     }
     return res;

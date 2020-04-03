@@ -71,6 +71,8 @@ RGB get_material_color (const Colors &color) {
             return RGB(0, 0, 255);
         case PURPLE:
             return RGB(162, 1, 202);
+        case YELLOW:
+            return RGB(245, 230, 31);
         default: //BG_COLOR
             return RGB(103, 213, 213);
     }
