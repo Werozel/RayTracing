@@ -69,11 +69,23 @@ RGB get_material_color (const Colors &color) {
             return RGB(0, 255, 0);
         case BLUE:
             return RGB(0, 0, 255);
+        case LIGHT_BLUE:
+            return RGB(103, 213, 213); 
         case PURPLE:
             return RGB(162, 1, 202);
+        case DARK_PURPLE:
+            return RGB(159, 43, 104);
         case YELLOW:
             return RGB(245, 230, 31);
+        case ORANGE:
+            return RGB(236, 155, 50);
+        case BROWN:
+            return RGB(152, 110, 85);
+        case PINK:
+            return RGB(226, 114, 178);
+        case DARK_PINK:
+            return RGB(171, 66, 125);
         default: //BG_COLOR
-            return RGB(103, 213, 213);
+            return RGB(208, 111, 255);
     }
 }

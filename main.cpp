@@ -35,18 +35,20 @@ RGB cast_ray(const Ray &ray, const std::vector<Object *> &objects,
     float min_dist = std::numeric_limits<float>::max();
     Object *intersected_obj = objects[0];
     int obj_i = 0;
-    for (int i = 0; i < objects.size(); i++) {
+    int i = 0;
+    for (const auto& obj: objects) {
         // Returns Point(-1, -1, -1) if no intersection detected
-        Point curr_intersection = objects[i]->ray_intersection(ray); // Intersection point of ray
+        Point curr_intersection = obj->ray_intersection(ray); // Intersection point of ray
         if (curr_intersection != no_intersection) {
             float curr_distance = distance(curr_intersection, ray.get_start());
             if (curr_distance < min_dist) {
                 min_dist = curr_distance;
                 intersection_point = curr_intersection;
-                intersected_obj = objects[i];
+                intersected_obj = obj;
                 obj_i = i;
             }
         }
+        i++;
     }
 
     if (intersection_point == no_intersection)  { return get_material_color();}
@@ -55,7 +57,7 @@ RGB cast_ray(const Ray &ray, const std::vector<Object *> &objects,
     
     // Calculating brightness
     float brightness = 0; // Brightnesss of intersection point
-    for (auto light: lights) {
+    for (const auto& light: lights) {
         Vector vector_of_incidence = Vector(intersection_point, light.get_position()).normalize(); // To light direction
 
         Ray to_light(intersection_point, vector_of_incidence);
@@ -207,15 +209,18 @@ void render (const std::vector<Object *> &objects,
 
 // Loads .obj file
 void load_object(const std::string &file_name, const Point &pos, 
-                 const Material &m, const int &scale, std::vector<Object *> &arr) {
+                 const Material &m, const int &scale, std::vector<Object *> &arr,
+                 const int &x_m = 1, const int &y_m = 1, const int &z_m = 1) {
     std::ifstream ifs("obj/" + file_name);
     std::vector<Point> points;
     points.push_back(Point(0, 0, 0));
     char mode;
     float x, y, z;
-    while (ifs >> mode && mode == 'v') {
+    while (ifs >> mode) {
+        if (mode == 'f') break;
+        if (mode != 'v') continue;
         ifs >> x >> y >> z;
-        points.push_back(scale * Point(x, -y, z) + pos);
+        points.push_back(scale * Point(x_m * x, y_m * y, z_m * z) + pos);
     }
 
     int indexes[4];
@@ -232,7 +237,7 @@ void load_object(const std::string &file_name, const Point &pos,
             Point poly_center = (p1 + p2 + p3) / 3;
             arr.push_back(new Polygon(poly_center, m, p2, p1, p3));
         }
-        ifs >> mode;
+        while(ifs >> mode && mode != 'f');
     }
     ifs.close();
 }
@@ -262,22 +267,26 @@ int main (int argc, char **argv) {
     std::vector<Light> lights;
 
     // Adding lights
-    lights.push_back(Light(Point( 3 * width/4, 0, -100), 0.5));
-    lights.push_back(Light(Point(width/5, 0, 100), 0.75));
-    lights.push_back(Light(Point(width/2, height/2, -200), 0.4));
+    lights.push_back(Light(Point( 1500, -350, -300), 0.5));
+    lights.push_back(Light(Point(430, 0, -100), 0.75));
+    lights.push_back(Light(Point(1000, 550, -400), 0.4));
 
     // Adding objects
-    objects.push_back(new Sphere(300, Point(100, 540, 900), get_material(PLASTIC, GREEN)));    // Red
-    objects.push_back(new Sphere(150, Point(1200, 800, 600), get_material(METAL, BLUE))); // Purple
-    objects.push_back(new Sphere(200, Point(500, 700, 400), get_material(GLASS)));  // transparent
+    objects.push_back(new Sphere(300, Point(150, 540, 700), get_material(PLASTIC, BLUE)));    // Red
+    objects.push_back(new Sphere(150, Point(1250, 800, 400), get_material(METAL, BLUE))); // Purple
+    objects.push_back(new Sphere(200, Point(550, 700, 200), get_material(GLASS)));  // transparent
     // objects.push_back(new Sphere(200, Point(width/2, -200, 1100), get_material(METAL))); // mirror
-    objects.push_back(new Sphere(300, Point(1500, 100, 500), get_material(PLASTIC, RED))); // Blue 2
+    objects.push_back(new Sphere(300, Point(1550, 100, 300), get_material(PLASTIC, RED))); // Blue 2
 
-    objects.push_back(new SceneFloor(Point(width/2, height * 0.9, 0), get_material(PLASTIC, PURPLE), WHITE, 200));
+    objects.push_back(new SceneFloor(Point(950, 950, 0), get_material(PLASTIC, DARK_PINK), LIGHT_BLUE, 200));
 
     // Loading objects
-    load_object("duck.obj", Point(width * 0.63, 750, width * 0.3), get_material(PLASTIC, YELLOW), 60, objects);
-    load_object("Palm_Tree.obj", Point(200, height - 200, 350), get_material(PLASTIC, WHITE), 150, objects);
+    load_object("duck.obj", Point(1250, 750, 450), get_material(PLASTIC, ORANGE), 60, objects, 1, -1, 1);
+    load_object("Palm_Tree_leaves.obj", Point(250, 950, 150), get_material(PLASTIC, GREEN), 150, objects, 1, -1, 1);
+    load_object("Palm_Tree_trunk.obj", Point(250, 950, 150), get_material(PLASTIC, BROWN), 150, objects, 1, -1, 1);
+    // load_object("bust.obj", Point(width/2, height - 100, 200), get_material(PLASTIC, WHITE), 250, objects, 1, -1, -1);
+    // load_object("David.obj", Point(width/2, height - 100, 100), get_material(PLASTIC, WHITE), 2, objects);
+    // load_object("Discobolus.obj", Point(width/2, height - 100, 100), get_material(PLASTIC, WHITE), 2, objects);
     printf("Loaded %d objects\n", (int)objects.size());
 
     // Start rendering
