@@ -106,13 +106,13 @@ class Rectangle: public Object {
 };
 
 
-class Bottom: public Object {
+class SceneFloor: public Object {
     public:
 
-        Bottom(const Point &pos, const Material &m): Object(pos, m) {}
-        Bottom(const Bottom &f): Object(f.get_position(), f.get_material()) {}
+        SceneFloor(const Point &pos, const Material &m): Object(pos, m) {}
+        SceneFloor(const SceneFloor &f): Object(f.get_position(), f.get_material()) {}
 
-        void operator= (const Bottom &f);
+        void operator= (const SceneFloor &f);
 
         Point ray_intersection(const Ray &ray) const;
         Vector get_norm(const Point &p) const;

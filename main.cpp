@@ -266,7 +266,7 @@ int main (int argc, char **argv) {
     // objects.push_back(new Sphere(200, Point(width/2, -200, 1100), get_material(METAL))); // mirror
     objects.push_back(new Sphere(300, Point(1500, 100, 500), get_material(PLASTIC, BLUE))); // Blue 2
 
-    objects.push_back(new Bottom(Point(width/2, height * 0.9, 0), get_material(PLASTIC, PURPLE)));
+    objects.push_back(new SceneFloor(Point(width/2, height * 0.9, 0), get_material(PLASTIC, PURPLE)));
 
     // Loading objects
     load_object("duck.obj", Point(width * 0.63, 750, width * 0.3), get_material(PLASTIC, GREEN), 60, objects);

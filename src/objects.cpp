@@ -176,7 +176,7 @@ Vector Rectangle::get_norm (const Point &p) const {
 
 // ------------------------ Floor ---------------------------
 
-void Bottom::operator= (const Bottom &f) {
+void SceneFloor::operator= (const SceneFloor &f) {
     if (&f == this) { return;}
     delete position;
     delete material;
@@ -184,7 +184,7 @@ void Bottom::operator= (const Bottom &f) {
     material = new Material(f.get_material());
 }
 
-Point Bottom::ray_intersection(const Ray &ray) const {
+Point SceneFloor::ray_intersection(const Ray &ray) const {
     Point p1(*position + Point(1, 0, 0)), p2(*position + Point(0, 0, 1)), p3(*position);
     Vector E1(p1, p2), E2(p1, p3);
     Vector T(p1, ray.get_start());
@@ -193,19 +193,15 @@ Point Bottom::ray_intersection(const Ray &ray) const {
 
     float z = P * E1;
     float t = Q * E2 / z;
-    // float u = P * T / z;
-    // float v = Q * ray.get_direction() / z;
-    // float k = 1 - u - v;
     
     if ( t > 0) {
-        // return Point(k * *p2 + u * *p3 + v * *p1);
         return Point(ray.get_start() + t * ray.get_direction());
     } else {
         return Point(-1, -1, -1);
     } 
 }
 
-Vector Bottom::get_norm(const Point &p) const {
+Vector SceneFloor::get_norm(const Point &p) const {
     return Vector(0, -1, 0);
 }
 
