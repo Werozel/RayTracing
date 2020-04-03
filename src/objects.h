@@ -55,10 +55,11 @@ class Sphere: public Object {
 
         void operator= (const Sphere &s);
 
-        virtual Point ray_intersection(const Ray &ray) const;
+        Point ray_intersection(const Ray &ray) const;
         // Vector from center to p
-        virtual Vector get_norm(const Point &p) const;
+        Vector get_norm(const Point &p) const;
 
+        ~Sphere();
 };
 
 
@@ -67,6 +68,7 @@ class Polygon: public Object {
         Point *p1;
         Point *p2;
         Point *p3;
+        Vector *norm;
 
         Polygon (const Point &pos, const Material &m, const Point &p1, const Point &p2, const Point &p3);
         Polygon (const Polygon &p);
@@ -78,11 +80,12 @@ class Polygon: public Object {
         Point & get_p1() const;
         Point & get_p2() const;
         Point & get_p3() const;
+        Vector & get_polygon_norm() const;
 
         void operator= (const Polygon &p);
 
-        virtual Point ray_intersection(const Ray &ray) const;
-        virtual Vector get_norm(const Point &p) const;
+        Point ray_intersection(const Ray &ray) const;
+        Vector get_norm(const Point &p) const;
 
         ~Polygon();
 };
@@ -97,7 +100,8 @@ class Ray {
         Ray(const Point &start_point, const Vector &dir);
 
         Point & get_start() const;
-        Vector & get_direction() const;         
+        Vector & get_direction() const; 
+        
 
         // Gets a point on a ray closest to given point
         Point get_closest_point_to_point (const Point &p) const;

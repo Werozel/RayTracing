@@ -7,16 +7,18 @@ Material::Material(const SurfaceType &stype,
                     const Colors &col, const float &deffuse_c, 
                     const float &mirror_c, const float &shine, 
                     const float &refr_index):
-        surface_type(stype), color(new RGB(get_color(col))),
-        deffuse_coef(deffuse_c), mirror_coef(mirror_c),
-        shininess(shine), refractive_index(refr_index)  {}
+        surface_type(stype), deffuse_coef(deffuse_c), mirror_coef(mirror_c),
+        shininess(shine), refractive_index(refr_index)  {
+            color = new RGB(get_color(col));
+        }
 
 
 Material::Material(const Material &m): 
-    surface_type(m.get_surface_type()),
-    color(new RGB(m.get_obj_color())), deffuse_coef(m.get_deffuse_coef()),
+    surface_type(m.get_surface_type()), deffuse_coef(m.get_deffuse_coef()),
     mirror_coef(m.get_mirror_coef()), shininess(m.get_shininess()), 
-    refractive_index(m.get_refractive_index()) {}
+    refractive_index(m.get_refractive_index()) {
+        color = new RGB(m.get_obj_color());
+    }
 
 
 RGB & Material::get_obj_color() const { return *color;}
@@ -43,7 +45,7 @@ Material::~Material() { delete color;}
 Material get_material(const Materials &m, const Colors &color) {
     switch (m) {
         case GLASS:
-            return Material(TRANSPARENT, color, 1, 1.7, 250, 1.5);
+            return Material(TRANSPARENT, color, 1, 1.7, 250, 1.4);
         case METAL:
             return Material(MIRROR, color, 1, 1.5, 400, 1);
         case PLASTIC:

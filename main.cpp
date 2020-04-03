@@ -90,8 +90,10 @@ RGB cast_ray(const Ray &ray, const std::vector<Object *> &objects,
         return (brightness == 0.0) ? get_color(BLACK) : intersected_obj->get_color() * brightness;
 
     } else {       // if MIRROR or TRANSPARENT
-        Vector reflect_dir = *ray.direction - 2 * (*ray.direction * norm) * norm;
-        Ray reflected_ray(intersection_point, reflect_dir.normalize());
+        Vector reflect_dir = ray.get_direction() - 2 * (ray.get_direction() * norm) * norm;
+        Point reflect_start = reflect_dir*norm < 0 ? intersection_point - norm * 0.001 : 
+                                                    intersection_point + norm * 0.001;
+        Ray reflected_ray(reflect_start, reflect_dir.normalize());
         RGB reflection_result = cast_ray(reflected_ray, objects, lights, depth + 1);
 
         RGB refraction_result(0, 0, 0);
@@ -201,7 +203,7 @@ void render (const std::vector<Object *> &objects,
 
 // Loads .obj file
 void load_object(const std::string &file_name, const Point &pos, 
-                 const Material &m, const int &scale, std::vector<Object *> *arr) {
+                 const Material &m, const int &scale, std::vector<Object *> &arr) {
     std::ifstream ifs("obj/" + file_name);
     std::vector<Point> points;
     points.push_back(Point(0, 0, 0));
@@ -218,10 +220,10 @@ void load_object(const std::string &file_name, const Point &pos,
         Point p1 = points[i1], p2 = points[i2], p3 = points[i3];
 
         Point poly_center = (p1 + p2 + p3) / 3;
-        Vector to_center = Vector(pos, poly_center);
-        arr->push_back(new Polygon(poly_center, m, p2, p1, p3));
+        arr.push_back(new Polygon(poly_center, m, p2, p1, p3));
         ifs >> mode;
     }
+    ifs.close();
 }
 
 
@@ -256,13 +258,13 @@ int main (int argc, char **argv) {
 
     // Adding objects
     objects.push_back(new Sphere(300, Point(100, 540, 900), get_material(PLASTIC, RED)));    // Red
-    objects.push_back(new Sphere(150, Point(1200, 800, 600), get_material(PLASTIC, BLUE))); // Purple
+    objects.push_back(new Sphere(150, Point(1200, 800, 600), get_material(METAL, BLUE))); // Purple
     objects.push_back(new Sphere(200, Point(500, 600, 400), get_material(GLASS)));  // transparent
     // objects.push_back(new Sphere(200, Point(width/2, -200, 1100), get_material(METAL))); // mirror
-    objects.push_back(new Sphere(300, Point(1500, 400, 500), get_material(METAL, BLUE))); // Blue 2
+    objects.push_back(new Sphere(300, Point(1500, 400, 500), get_material(PLASTIC, BLUE))); // Blue 2
 
     // Loading objects
-    load_object("duck.obj", Point(width * 0.75 - 100, 2 * height * 0.2, width * 0.3), get_material(PLASTIC, PURPLE), 60, &objects);
+    load_object("duck.obj", Point(width * 0.63, 2 * height * 0.2, width * 0.3), get_material(PLASTIC, PURPLE), 60, objects);
 
     // Start rendering
     std::cout << "Started" << std::endl;

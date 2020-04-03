@@ -61,13 +61,26 @@ Vector Sphere::get_norm(const Point &p) const {
     return Vector(*position, p).normalize();
 }
 
+Sphere::~Sphere() {
+}
+
 
 // ----------------------- Polygon ---------------------------
-Polygon::Polygon (const Point &pos, const Material &m, const Point &p1_t, const Point &p2_t, const Point &p3_t):
-    Object(pos, m), p1(new Point(p1_t)), p2(new Point (p2_t)), p3(new Point(p3_t)) {}
+Polygon::Polygon (const Point &pos, const Material &m, const Point &p1_t, 
+                  const Point &p2_t, const Point &p3_t):
+    Object(pos, m) {
+        p1 = new Point(p1_t);
+        p2 = new Point(p2_t);
+        p3 = new Point(p3_t);
+        norm = new Vector(cross_prod(Vector(pos, *p1), Vector(pos, *p2)).normalize());
+    }
 
-Polygon::Polygon (const Polygon &p): Object(p.get_position(), p.get_material()), 
-    p1(new Point(p.get_p1())), p2(new Point(p.get_p2())), p3(new Point(p.get_p3())) {}
+Polygon::Polygon (const Polygon &p): Object(p.get_position(), p.get_material()) {
+        p1 = new Point(p.get_p1());
+        p2 = new Point(p.get_p2());
+        p3 = new Point(p.get_p3());
+        norm = new Vector(p.get_polygon_norm());
+    }
 
 
 Vector Polygon::get_v1() const { return Vector(*position, *p1);}
@@ -76,17 +89,20 @@ Vector Polygon::get_v3() const { return Vector(*position, *p3);}
 Point & Polygon::get_p1() const { return *p1;}
 Point & Polygon::get_p2() const { return *p2;}
 Point & Polygon::get_p3() const { return *p3;}
+Vector & Polygon::get_polygon_norm() const { return *norm;}
 
 
 void Polygon::operator= (const Polygon &p) {
     if (&p == this) { return;}
     delete position;
     delete material;
+    delete norm;
     delete p1;
     delete p2;
     delete p3;
     position = new Point(p.get_position());
     material = new Material(p.get_material());
+    norm = new Vector(p.get_polygon_norm());
     p1 = new Point(p.get_p1());
     p2 = new Point(p.get_p2());
     p3 = new Point(p.get_p3());
@@ -115,13 +131,14 @@ Point Polygon::ray_intersection(const Ray &ray) const {
 
 Vector Polygon::get_norm(const Point &p) const {
     // TODO figure out the direction of norm
-    return cross_prod(Vector(p, *p1), Vector(p, *p2)).normalize();
+    return *norm;
 }
 
 Polygon::~Polygon() {
     delete p1;
     delete p2;
     delete p3;
+    delete norm;
 }
 
 // ----------------------- Ray -------------------------------
