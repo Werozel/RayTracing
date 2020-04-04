@@ -232,10 +232,10 @@ void load_object(const std::string &file_name, const Point &pos,
             ifs >> indexes[3];
             Point p4 = points[indexes[3]];
             Point poly_center = (p1 + p2 + p3 + p4) / 4;
-            arr.push_back(new Rectangle(poly_center, m, p2, p1, p4, p3));
+            arr.push_back(new Rectangle(poly_center, m, p1, p2, p3, p4));
         } else {
             Point poly_center = (p1 + p2 + p3) / 3;
-            arr.push_back(new Polygon(poly_center, m, p2, p1, p3));
+            arr.push_back(new Polygon(poly_center, m, p1, p2, p3));
         }
         while(ifs >> mode && mode != 'f');
     }
@@ -261,6 +261,7 @@ int main (int argc, char **argv) {
             continue;
         }
     }
+    if (scene_number == 0) return 0;
 
     std::vector<Object *> objects;
     std::vector<Polygon> polygons;
@@ -269,24 +270,27 @@ int main (int argc, char **argv) {
     // Adding lights
     lights.push_back(Light(Point( 1500, -350, -300), 0.5));
     lights.push_back(Light(Point(430, 0, -100), 0.75));
-    lights.push_back(Light(Point(1000, 550, -400), 0.4));
+    // lights.push_back(Light(Point(1000, 550, -400), 0.4));
 
     // Adding objects
-    objects.push_back(new Sphere(300, Point(150, 540, 700), get_material(PLASTIC, BLUE)));    // Red
-    objects.push_back(new Sphere(150, Point(1250, 800, 400), get_material(METAL, BLUE))); // Purple
-    objects.push_back(new Sphere(200, Point(550, 700, 200), get_material(GLASS)));  // transparent
+    objects.push_back(new Sphere(300, Point(150, 540, 700), get_material(PLASTIC, BLUE)));    // Blue under the tree
+    objects.push_back(new Sphere(150, Point(1250, 800, 400), get_material(METAL, BLUE))); // Mirror on the right
+    objects.push_back(new Sphere(200, Point(550, 700, 200), get_material(GLASS)));  // Glass under the tree
     // objects.push_back(new Sphere(200, Point(width/2, -200, 1100), get_material(METAL))); // mirror
-    objects.push_back(new Sphere(300, Point(1550, 100, 300), get_material(PLASTIC, RED))); // Blue 2
+    objects.push_back(new Sphere(300, Point(1550, 100, 300), get_material(PLASTIC, RED))); // Red in the air
 
-    objects.push_back(new SceneFloor(Point(950, 950, 0), get_material(PLASTIC, DARK_PINK), LIGHT_BLUE, 200));
+    objects.push_back(new SceneFloor(Point(950, 950, 0), get_material(PLASTIC, DARK_PINK), LIGHT_BLUE, 200));   // Floor
 
     // Loading objects
-    load_object("duck.obj", Point(1250, 750, 450), get_material(PLASTIC, ORANGE), 60, objects, 1, -1, 1);
-    load_object("Palm_Tree_leaves.obj", Point(250, 950, 150), get_material(PLASTIC, GREEN), 150, objects, 1, -1, 1);
-    load_object("Palm_Tree_trunk.obj", Point(250, 950, 150), get_material(PLASTIC, BROWN), 150, objects, 1, -1, 1);
-    // load_object("bust.obj", Point(width/2, height - 100, 200), get_material(PLASTIC, WHITE), 250, objects, 1, -1, -1);
+    // load_object("duck.obj", Point(1250, 750, 450), get_material(PLASTIC, ORANGE), 60, objects, 1, -1, 1);
+    // load_object("Palm_Tree_leaves.obj", Point(250, 950, 150), get_material(PLASTIC, GREEN), 150, objects, 1, -1, 1);
+    // load_object("Palm_Tree_trunk.obj", Point(250, 950, 150), get_material(PLASTIC, BROWN), 150, objects, 1, -1, 1);
+    // load_object("bust.obj", Point(width/2, height - 100, 200), get_material(PLASTIC, WHITE), 250, objects, -1, -1, -1);
+    load_object("cube.obj", Point(1400, 850, 0), get_material(PLASTIC, GREEN), 100, objects);
+    load_object("Octahedron.obj", Point(200, 700, 0), get_material(PLASTIC, YELLOW), 200, objects);
     // load_object("David.obj", Point(width/2, height - 100, 100), get_material(PLASTIC, WHITE), 2, objects);
-    // load_object("Discobolus.obj", Point(width/2, height - 100, 100), get_material(PLASTIC, WHITE), 2, objects);
+    // load_object("Discobolus.obj", Point(width/2 + 50, height - 100, 0), get_material(PLASTIC, WHITE), 10, objects, 1, -1, 1);
+
     printf("Loaded %d objects\n", (int)objects.size());
 
     // Start rendering

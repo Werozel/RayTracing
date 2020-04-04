@@ -73,7 +73,7 @@ Polygon::Polygon (const Point &pos, const Material &m, const Point &p1_t,
         p1 = new Point(p1_t);
         p2 = new Point(p2_t);
         p3 = new Point(p3_t);
-        norm = new Vector(cross_prod(Vector(pos, *p1), Vector(pos, *p2)).normalize());
+        norm = new Vector(cross_prod(Vector(pos, *p2), Vector(pos, *p1)).normalize());
     }
 
 Polygon::Polygon (const Polygon &p): Object(p.get_position(), p.get_material()) {
@@ -83,6 +83,11 @@ Polygon::Polygon (const Polygon &p): Object(p.get_position(), p.get_material()) 
         norm = new Vector(p.get_polygon_norm());
     }
 
+void Polygon::set_norm(const Vector &n) {
+    if (&n == this->norm) { return;}
+    delete norm;
+    norm = new Vector(n);
+}
 
 Vector Polygon::get_v1() const { return Vector(*position, *p1);}
 Vector Polygon::get_v2() const { return Vector(*position, *p2);}
@@ -172,7 +177,7 @@ Point Rectangle::ray_intersection(const Ray &ray) const {
 }
 
 Vector Rectangle::get_norm (const Point &p) const {
-    return p1.get_norm(p);
+    return p1.get_polygon_norm();
 }
 
 // ------------------------ Floor ---------------------------

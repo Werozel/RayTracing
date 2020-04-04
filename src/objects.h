@@ -21,6 +21,7 @@ class Object {
     public:
         Point *position;
         Material *material;
+        Vector *norm;
 
         Object(const Point &pos, const Material &m);
 
@@ -68,10 +69,13 @@ class Polygon: public Object {
         Point *p1;
         Point *p2;
         Point *p3;
-        Vector *norm;
 
-        Polygon (const Point &pos, const Material &m, const Point &p1, const Point &p2, const Point &p3);
+        Polygon (const Point &pos, const Material &m, 
+                 const Point &p1, const Point &p2, const Point &p3);
         Polygon (const Polygon &p);
+
+        void set_norm(const Vector &n);
+
 
         // From position to pi
         Vector get_v1() const;

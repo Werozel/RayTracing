@@ -2,6 +2,8 @@ rt
 .vscode
 result.*
 res*.*
+valgrind*
+test
 *.o
 build
 a.out
