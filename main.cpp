@@ -330,8 +330,8 @@ int main (int argc, char **argv) {
         lights.push_back(Light(Point(1000, 550, -400), 0.4));
 
         objects.push_back(new Sphere(300, Point(250, 540, 700), get_material(PLASTIC, BLUE)));    // Blue under the tree
-        objects.push_back(new Sphere(150, Point(1400, 800, 400), get_material(METAL, BLUE))); // Mirror on the right
-        objects.push_back(new Sphere(200, Point(650, 700, 200), get_material(GLASS)));  // Glass under the tree
+        objects.push_back(new Sphere(150, Point(1400, 800, 400), get_material(METAL))); // Mirror on the right
+        objects.push_back(new Sphere(200, Point(650, 700, 200), get_material(METAL)));  // Glass under the tree
 
 
         objects.push_back(new SceneFloor(Point(950, 950, 0), get_material(PLASTIC, DARK_PINK), LIGHT_BLUE, 200));   // Floor

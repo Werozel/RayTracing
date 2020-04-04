@@ -45,7 +45,7 @@ Material::~Material() { delete color;}
 Material get_material(const Materials &m, const Colors &color) {
     switch (m) {
         case GLASS:
-            return Material(TRANSPARENT, color, 1, 1.5, 250, 1.43);
+            return Material(TRANSPARENT, BLACK, 1, 1.5, 250, 1.43);
         case METAL:
             return Material(MIRROR, BLACK, 0.2, 1.5, 400, 1);
         case PLASTIC:
