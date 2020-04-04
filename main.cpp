@@ -171,8 +171,10 @@ void render (const std::vector<Object *> &objects,
         pix[i] = new RGB[w];
     }
 
-    Point start(w/2, h/2, -w/2);
+    Point start(width/2, height/2, -width/2);
     float k = 1.f / (float)smoothness;
+    float kx = (float)width / (float)w;
+    float ky = (float)height / (float)h;
 
     omp_set_num_threads(threads_num);
     #pragma omp parallel for collapse(2)
@@ -182,7 +184,7 @@ void render (const std::vector<Object *> &objects,
             Ray ray;
             RGB res;   
             for (int t = 0; t < smoothness; t++) {
-                direction = Vector(start, Point(j + k*t, i + k*t, 0)).normalize();
+                direction = Vector(start, Point(kx * (j + k*t), ky * (i + k*t), 0)).normalize();
                 ray = Ray(start, direction);
                 res += cast_ray(ray, objects, lights);
             }
@@ -277,7 +279,7 @@ int main (int argc, char **argv) {
     objects.push_back(new Sphere(150, Point(1250, 800, 400), get_material(METAL, BLUE))); // Mirror on the right
     objects.push_back(new Sphere(200, Point(550, 700, 200), get_material(GLASS)));  // Glass under the tree
     // objects.push_back(new Sphere(200, Point(width/2, -200, 1100), get_material(METAL))); // mirror
-    objects.push_back(new Sphere(300, Point(1550, 100, 300), get_material(PLASTIC, RED))); // Red in the air
+    // objects.push_back(new Sphere(300, Point(1550, 100, 300), get_material(PLASTIC, RED))); // Red in the air
 
     objects.push_back(new SceneFloor(Point(950, 950, 0), get_material(PLASTIC, DARK_PINK), LIGHT_BLUE, 200));   // Floor
 
@@ -287,7 +289,7 @@ int main (int argc, char **argv) {
     // load_object("Palm_Tree_trunk.obj", Point(250, 950, 150), get_material(PLASTIC, BROWN), 150, objects, 1, -1, 1);
     // load_object("bust.obj", Point(width/2, height - 100, 200), get_material(PLASTIC, WHITE), 250, objects, -1, -1, -1);
     load_object("cube.obj", Point(1400, 850, 0), get_material(PLASTIC, GREEN), 100, objects);
-    load_object("Octahedron.obj", Point(200, 700, 0), get_material(PLASTIC, YELLOW), 200, objects);
+    load_object("Octahedron.obj", Point(1550, 100, 300), get_material(PLASTIC, RED), 400, objects);
     // load_object("David.obj", Point(width/2, height - 100, 100), get_material(PLASTIC, WHITE), 2, objects);
     // load_object("Discobolus.obj", Point(width/2 + 50, height - 100, 0), get_material(PLASTIC, WHITE), 10, objects, 1, -1, 1);
 
@@ -295,7 +297,7 @@ int main (int argc, char **argv) {
 
     // Start rendering
     std::cout << "Started" << std::endl;
-    render(objects, lights, 1920, 1080, smoothness);
+    render(objects, lights, 1280, 720, smoothness);
     std::cout << "Ready!" << std::endl;
 
     for (int i = 0; i < objects.size(); i++) {
