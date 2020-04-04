@@ -27,7 +27,7 @@ const Point no_intersection(-1, -1, -1);
 RGB *Material::bg_color = new RGB(103, 213, 213);
 
 
-void load_img(const std::string &path) {
+void load_bg_img(const std::string &path) {
     stbi_image_free(bg_image);
     bg_image = stbi_load(("backgrounds/" + path).data(), &img_width, &img_height, &img_channels, 0);
     if (bg_image != NULL) {
@@ -36,7 +36,7 @@ void load_img(const std::string &path) {
 }
 
 
-RGB get_bg_color(const Vector &dir = Vector(1, 1, 1), const int &w = width, const int &h = height) {
+RGB get_bg_color(const Vector &dir) {
     if (bg_map_flag) {
         Vector norm = dir.normalize();
         // std::cout << norm.get_x() << " " << norm.get_y() << std::endl;
@@ -207,8 +207,8 @@ void render (const std::vector<Object *> &objects,
 
     omp_set_num_threads(threads_num);
     #pragma omp parallel for collapse(2)
-    for (int i = 0; i < h; i++) {
-        for (int j = 0; j < w; j++) {
+    for (int i = 0; i < h; ++i) {
+        for (int j = 0; j < w; ++j) {
             Vector direction;
             Ray ray;
             RGB res;   
@@ -305,6 +305,8 @@ int main (int argc, char **argv) {
 
         w = 1280, h = 720;
 
+        load_bg_img("3palms.jpg");
+
         lights.push_back(Light(Point( 1500, -350, -300), 0.5));
         lights.push_back(Light(Point(430, 0, -100), 0.75));
         lights.push_back(Light(Point(1000, 550, -400), 0.4));
@@ -325,6 +327,8 @@ int main (int argc, char **argv) {
 
         w = 1920, h = 1080;
 
+        load_bg_img("landscape.jpg");
+
         delete Material::bg_color;
         Material::bg_color = new RGB(208, 111, 255);
 
@@ -339,9 +343,9 @@ int main (int argc, char **argv) {
         objects.push_back(new Sphere(200, Point(550, 700, 200), get_material(GLASS)));  // Glass under the tree
         objects.push_back(new Sphere(300, Point(1550, 100, 300), get_material(PLASTIC, RED))); // Red in the air
 
-        objects.push_back(new SceneFloor(Point(950, 950, 0), get_material(PLASTIC, DARK_PINK), LIGHT_BLUE, 200));   // Floor
+        objects.push_back(new SceneFloor(Point(950, 950, 0), get_material(PLASTIC, ORANGE), PINK, 200));   // Floor
 
-        load_object("duck.obj", Point(1250, 750, 450), get_material(PLASTIC, ORANGE), 60, objects, 1, -1, 1);
+        load_object("duck.obj", Point(1250, 750, 450), get_material(PLASTIC, GREEN), 60, objects, 1, -1, 1);
 
         break;
 
@@ -350,8 +354,7 @@ int main (int argc, char **argv) {
     case 3:
         w = 1920, h = 1080;
 
-        load_img("win_mountain.jpg");
-
+        load_bg_img("win_mountain.jpg");
 
         delete Material::bg_color;
         Material::bg_color = new RGB(208, 111, 255);
@@ -362,8 +365,7 @@ int main (int argc, char **argv) {
 
         objects.push_back(new Sphere(300, Point(250, 540, 700), get_material(PLASTIC, BLUE)));    // Blue under the tree
         objects.push_back(new Sphere(150, Point(1400, 800, 400), get_material(METAL))); // Mirror on the right
-        objects.push_back(new Sphere(200, Point(650, 700, 200), get_material(METAL)));  // Glass under the tree
-
+        objects.push_back(new Sphere(200, Point(650, 700, 200), get_material(GLASS)));  // Glass under the tree
 
         objects.push_back(new SceneFloor(Point(950, 950, 0), get_material(PLASTIC, DARK_PINK), LIGHT_BLUE, 200));   // Floor
 
@@ -373,9 +375,7 @@ int main (int argc, char **argv) {
         load_object("bust.obj", Point(width/2 + 150, height - 100, 200), get_material(MARBLE), 250, objects, -1, -1, -1);
         load_object("Octahedron.obj", Point(1550, 300, 300), get_material(PLASTIC, DARK_PURPLE), 500, objects);
 
-
         break;
-
 
     default:
         break;
