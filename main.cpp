@@ -14,12 +14,40 @@
 
 #define STB_IMAGE_WRITE_IMPLEMENTATION
 #include "stb/stb_image_write.h"
+#define STB_IMAGE_IMPLEMENTATION
+#include "stb/stb_image.h"
 
 char *output_file = new char[100];
 int threads_num = 32;
 int scene_number = 1;
+static bool bg_map_flag = false;
+unsigned char *bg_image = nullptr;
+int img_width, img_height, img_channels;
 const Point no_intersection(-1, -1, -1);
 RGB *Material::bg_color = new RGB(103, 213, 213);
+
+
+void load_img(const std::string &path) {
+    stbi_image_free(bg_image);
+    bg_image = stbi_load(("backgrounds/" + path).data(), &img_width, &img_height, &img_channels, 0);
+    if (bg_image != NULL) {
+        bg_map_flag = true;
+    }
+}
+
+
+RGB get_bg_color(const Vector &dir = Vector(1, 1, 1), const int &w = width, const int &h = height) {
+    if (bg_map_flag) {
+        Vector norm = dir.normalize();
+        // std::cout << norm.get_x() << " " << norm.get_y() << std::endl;
+        int x = (1.0 + norm.get_x()) * img_width / 2.0;
+        int y = (1.0 + norm.get_y()) * img_height / 2.0;
+        int i = 3 * (x + img_width * y);
+        return RGB(bg_image[i], bg_image[i + 1], bg_image[i + 2]);
+    } else {
+        return get_material_color();
+    }
+}
 
 
 template<typename Base, typename T>
@@ -29,8 +57,8 @@ inline bool instanceof(const T *ptr) {
 
 RGB cast_ray(const Ray &ray, const std::vector<Object *> &objects,
              const std::vector<Light> &lights, const int &depth = 0) {
-    if (objects.size() == 0) return get_material_color();
-    if (depth == recursion_gap) return get_material_color();
+    if (objects.size() == 0) return get_bg_color(ray.get_direction());
+    if (depth == recursion_gap) return get_bg_color(ray.get_direction());
 
     Point intersection_point = no_intersection;
     float min_dist = std::numeric_limits<float>::max();
@@ -52,7 +80,7 @@ RGB cast_ray(const Ray &ray, const std::vector<Object *> &objects,
         i++;
     }
 
-    if (intersection_point == no_intersection)  { return get_material_color();}
+    if (intersection_point == no_intersection)  { return get_bg_color(ray.get_direction());}
 
     Vector norm = intersected_obj->get_norm(intersection_point);
     
@@ -91,7 +119,7 @@ RGB cast_ray(const Ray &ray, const std::vector<Object *> &objects,
     }
     
     // Getting the color of the point
-    RGB result = get_material_color();
+    RGB result = get_bg_color(ray.get_direction());
     if (intersected_obj->get_stype() == OPAQUE) {
         
         return (brightness == 0.0) ? get_material_color(BLACK) : intersected_obj->get_color(intersection_point) * brightness;
@@ -322,6 +350,9 @@ int main (int argc, char **argv) {
     case 3:
         w = 1920, h = 1080;
 
+        load_img("win_mountain.jpg");
+
+
         delete Material::bg_color;
         Material::bg_color = new RGB(208, 111, 255);
 
@@ -385,6 +416,7 @@ int main (int argc, char **argv) {
         delete objects[i];
     }
     delete [] output_file;
+    stbi_image_free(bg_image);
 
     return 0;
 }

@@ -3,7 +3,7 @@ project (rt)
 
 include(CheckCXXCompilerFlag)
 
-set(LIB_DIR "${CMAKE_CURRENT_SOURCE_DIR}/lib")
+set(LIB_DIR "${CMAKE_CURRENT_SOURCE_DIR}")
 
 function(enable_cxx_compiler_flag_if_supported flag)
 string(FIND "${CMAKE_CXX_FLAGS}" "${flag}" flag_already_set)
@@ -25,6 +25,14 @@ file(GLOB GLOBAL_SOURCES *.h *.cpp)
 file(GLOB SOURCES src/*.cpp stb/*.cpp)
 
 add_executable(${PROJECT_NAME} ${GLOBAL_SOURCES} ${SOURCES} )
+
+set(OBJ_DIR "${LIB_DIR}/obj")
+set(BACKGROUND_DIR "${LIB_DIR}/background")
+target_include_directories(${PROJECT_NAME} PRIVATE 
+   OBJ_DIR
+   BACKGROUND_DIR
+)
+
 
 # STB
 set(STB_LIB_DIR "${LIB_DIR}/stb")
