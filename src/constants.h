@@ -24,10 +24,12 @@ enum Colors {
 enum Materials {
     GLASS, 
     METAL, 
-    PLASTIC
+    PLASTIC,
+    COLORED_METAL, 
+    MARBLE
 };
 
-enum SurfaceType { OPAQUE, MIRROR, TRANSPARENT};
+enum SurfaceType { OPAQUE, MIRROR, TRANSPARENT, COLORED_MIRROR};
 enum IntersectionType { ABSORPTION, REFLECTION, REFLECTION_AND_REFRACTION};
 
 

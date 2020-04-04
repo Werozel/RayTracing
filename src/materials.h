@@ -7,9 +7,12 @@
 class RGB;
 
 
+void set_bg_color (const RGB &col);
+
 class Material {
     public:
-        RGB* color;
+        static RGB *bg_color;
+        RGB *color;
         float deffuse_coef;
         float mirror_coef;
         float shininess;
@@ -17,7 +20,7 @@ class Material {
         SurfaceType surface_type;
 
         Material(const SurfaceType &stype,
-                 const Colors &col = WHITE, const float &deffuse_c = 1, 
+                 const Colors &col = BLACK, const float &deffuse_c = 1, 
                  const float &mirror_c = 1, const float &shine = 70, 
                  const float &refr_index = 1);
         Material(const Material &m);

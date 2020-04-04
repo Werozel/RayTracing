@@ -19,6 +19,7 @@ char *output_file = new char[100];
 int threads_num = 32;
 int scene_number = 1;
 const Point no_intersection(-1, -1, -1);
+RGB *Material::bg_color = new RGB(103, 213, 213);
 
 
 template<typename Base, typename T>
@@ -133,7 +134,7 @@ RGB cast_ray(const Ray &ray, const std::vector<Object *> &objects,
 
         RGB glare = (brightness == 0.0) ? get_material_color(BLACK) : 
                         get_material_color(WHITE) * brightness * intersected_obj->get_mirror_coef();
-        result = (reflection_result + refraction_result) * 0.9 + glare;
+        result = (reflection_result * intersected_obj->get_mirror_coef() + refraction_result) * 0.9 + glare + intersected_obj->get_color(intersection_point) * intersected_obj->get_deffuse_coef();
 
     }
 
@@ -263,41 +264,121 @@ int main (int argc, char **argv) {
             continue;
         }
     }
-    if (scene_number == 0) return 0;
 
     std::vector<Object *> objects;
     std::vector<Polygon> polygons;
     std::vector<Light> lights;
+    int w = width, h = height;
+
+    switch (scene_number)
+    {
+        // Basic scene
+    case 1:
+
+        w = 1280, h = 720;
+
+        lights.push_back(Light(Point( 1500, -350, -300), 0.5));
+        lights.push_back(Light(Point(430, 0, -100), 0.75));
+        lights.push_back(Light(Point(1000, 550, -400), 0.4));
+
+        objects.push_back(new Sphere(300, Point(150, 540, 700), get_material(PLASTIC, BLUE)));    // Blue under the tree
+        objects.push_back(new Sphere(150, Point(1250, 800, 400), get_material(METAL, BLUE))); // Mirror on the right
+        objects.push_back(new Sphere(200, Point(550, 700, 200), get_material(GLASS)));  // Glass under the tree
+        
+        objects.push_back(new SceneFloor(Point(950, 950, 0), get_material(PLASTIC, DARK_PINK), WHITE, 200));   // Floor
+
+        load_object("cube.obj", Point(1400, 850, 0), get_material(PLASTIC, GREEN), 100, objects);
+        load_object("Octahedron.obj", Point(1550, 100, 300), get_material(PLASTIC, RED), 400, objects);
+        
+        break;
+
+        // Smoothess showcase
+    case 2:
+
+        w = 1920, h = 1080;
+
+        delete Material::bg_color;
+        Material::bg_color = new RGB(208, 111, 255);
+
+        smoothness = (smoothness == 1) ? 4 : smoothness;
+
+        lights.push_back(Light(Point( 1500, -350, -300), 0.5));
+        lights.push_back(Light(Point(430, 0, -100), 0.75));
+        lights.push_back(Light(Point(1000, 550, -400), 0.4));
+
+        objects.push_back(new Sphere(300, Point(150, 540, 700), get_material(PLASTIC, BLUE)));    // Blue under the tree
+        objects.push_back(new Sphere(150, Point(1250, 800, 400), get_material(METAL, BLUE))); // Mirror on the right
+        objects.push_back(new Sphere(200, Point(550, 700, 200), get_material(GLASS)));  // Glass under the tree
+        objects.push_back(new Sphere(300, Point(1550, 100, 300), get_material(PLASTIC, RED))); // Red in the air
+
+        objects.push_back(new SceneFloor(Point(950, 950, 0), get_material(PLASTIC, DARK_PINK), LIGHT_BLUE, 200));   // Floor
+
+        load_object("duck.obj", Point(1250, 750, 450), get_material(PLASTIC, ORANGE), 60, objects, 1, -1, 1);
+
+        break;
+
+        // The most complicated scene
+        // 2.5k polygons
+    case 3:
+        w = 1920, h = 1080;
+
+        delete Material::bg_color;
+        Material::bg_color = new RGB(208, 111, 255);
+
+        lights.push_back(Light(Point( 1500, -350, -300), 0.5));
+        lights.push_back(Light(Point(430, 0, -100), 0.75));
+        lights.push_back(Light(Point(1000, 550, -400), 0.4));
+
+        objects.push_back(new Sphere(300, Point(250, 540, 700), get_material(PLASTIC, BLUE)));    // Blue under the tree
+        objects.push_back(new Sphere(150, Point(1400, 800, 400), get_material(METAL, BLUE))); // Mirror on the right
+        objects.push_back(new Sphere(200, Point(650, 700, 200), get_material(GLASS)));  // Glass under the tree
+
+
+        objects.push_back(new SceneFloor(Point(950, 950, 0), get_material(PLASTIC, DARK_PINK), LIGHT_BLUE, 200));   // Floor
+
+        load_object("duck.obj", Point(1250, 750, 450), get_material(PLASTIC, ORANGE), 60, objects, 1, -1, 1);
+        load_object("Palm_Tree_leaves.obj", Point(250, 950, 150), get_material(PLASTIC, GREEN), 150, objects, 1, -1, 1);
+        load_object("Palm_Tree_trunk.obj", Point(250, 950, 150), get_material(PLASTIC, BROWN), 150, objects, 1, -1, 1);
+        load_object("bust.obj", Point(width/2 + 150, height - 100, 200), get_material(MARBLE), 250, objects, -1, -1, -1);
+        load_object("Octahedron.obj", Point(1550, 300, 300), get_material(PLASTIC, DARK_PURPLE), 500, objects);
+
+
+        break;
+
+
+    default:
+        break;
+    }
 
     // Adding lights
-    lights.push_back(Light(Point( 1500, -350, -300), 0.5));
-    lights.push_back(Light(Point(430, 0, -100), 0.75));
+    // lights.push_back(Light(Point( 1500, -350, -300), 0.5));
+    // lights.push_back(Light(Point(430, 0, -100), 0.75));
     // lights.push_back(Light(Point(1000, 550, -400), 0.4));
 
     // Adding objects
-    objects.push_back(new Sphere(300, Point(150, 540, 700), get_material(PLASTIC, BLUE)));    // Blue under the tree
-    objects.push_back(new Sphere(150, Point(1250, 800, 400), get_material(METAL, BLUE))); // Mirror on the right
-    objects.push_back(new Sphere(200, Point(550, 700, 200), get_material(GLASS)));  // Glass under the tree
+    // objects.push_back(new Sphere(300, Point(150, 540, 700), get_material(PLASTIC, BLUE)));    // Blue under the tree
+    // objects.push_back(new Sphere(150, Point(1250, 800, 400), get_material(METAL, BLUE))); // Mirror on the right
+    // objects.push_back(new Sphere(200, Point(550, 700, 200), get_material(GLASS)));  // Glass under the tree
     // objects.push_back(new Sphere(200, Point(width/2, -200, 1100), get_material(METAL))); // mirror
     // objects.push_back(new Sphere(300, Point(1550, 100, 300), get_material(PLASTIC, RED))); // Red in the air
 
-    objects.push_back(new SceneFloor(Point(950, 950, 0), get_material(PLASTIC, DARK_PINK), LIGHT_BLUE, 200));   // Floor
+    // objects.push_back(new SceneFloor(Point(950, 950, 0), get_material(PLASTIC, DARK_PINK), LIGHT_BLUE, 200));   // Floor
 
     // Loading objects
     // load_object("duck.obj", Point(1250, 750, 450), get_material(PLASTIC, ORANGE), 60, objects, 1, -1, 1);
     // load_object("Palm_Tree_leaves.obj", Point(250, 950, 150), get_material(PLASTIC, GREEN), 150, objects, 1, -1, 1);
     // load_object("Palm_Tree_trunk.obj", Point(250, 950, 150), get_material(PLASTIC, BROWN), 150, objects, 1, -1, 1);
-    // load_object("bust.obj", Point(width/2, height - 100, 200), get_material(PLASTIC, WHITE), 250, objects, -1, -1, -1);
-    load_object("cube.obj", Point(1400, 850, 0), get_material(PLASTIC, GREEN), 100, objects);
-    load_object("Octahedron.obj", Point(1550, 100, 300), get_material(PLASTIC, RED), 400, objects);
-    // load_object("David.obj", Point(width/2, height - 100, 100), get_material(PLASTIC, WHITE), 2, objects);
-    // load_object("Discobolus.obj", Point(width/2 + 50, height - 100, 0), get_material(PLASTIC, WHITE), 10, objects, 1, -1, 1);
+    // load_object("bust.obj", Point(width/2, height - 100, 200), get_material(MARBLE), 250, objects, -1, -1, -1);
+    // load_object("cube.obj", Point(1400, 850, 0), get_material(PLASTIC, GREEN), 100, objects);
+    // load_object("Octahedron.obj", Point(1550, 100, 300), get_material(PLASTIC, RED), 400, objects);
+    // load_object("David.obj", Point(width/2, height - 100, 100), get_material(MARBLE), 2, objects);
+    // load_object("Discobolus.obj", Point(width/2 + 50, height - 100, 0), get_material(MARBLE), 10, objects, 1, -1, 1);
 
     printf("Loaded %d objects\n", (int)objects.size());
 
     // Start rendering
     std::cout << "Started" << std::endl;
-    render(objects, lights, 1280, 720, smoothness);
+    render(objects, lights, w, h, smoothness);
     std::cout << "Ready!" << std::endl;
 
     for (int i = 0; i < objects.size(); i++) {

@@ -45,11 +45,15 @@ Material::~Material() { delete color;}
 Material get_material(const Materials &m, const Colors &color) {
     switch (m) {
         case GLASS:
-            return Material(TRANSPARENT, color, 1, 1.7, 250, 1.43);
+            return Material(TRANSPARENT, color, 1, 1.5, 250, 1.43);
         case METAL:
-            return Material(MIRROR, color, 1, 1.5, 400, 1);
+            return Material(MIRROR, BLACK, 0.2, 1.5, 400, 1);
         case PLASTIC:
             return Material(OPAQUE, color, 0.7, 1, 110, 1);
+        case COLORED_METAL:
+            return Material(MIRROR, color, 0.6, 1, 400, 1);
+        case MARBLE:
+            return Material(OPAQUE, WHITE, 1, 1, 110, 1);
         default:
             return Material(OPAQUE);
     }
@@ -86,6 +90,6 @@ RGB get_material_color (const Colors &color) {
         case DARK_PINK:
             return RGB(171, 66, 125);
         default: //BG_COLOR
-            return RGB(208, 111, 255);
+            return *Material::bg_color;
     }
 }
