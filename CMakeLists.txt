@@ -28,10 +28,9 @@ add_executable(${PROJECT_NAME} ${GLOBAL_SOURCES} ${SOURCES} )
 
 set(OBJ_DIR "${LIB_DIR}/obj")
 set(BACKGROUND_DIR "${LIB_DIR}/backgrounds")
-target_include_directories(${PROJECT_NAME} PRIVATE 
-   OBJ_DIR
-   BACKGROUND_DIR
-)
+target_include_directories(${PROJECT_NAME} PRIVATE ${OBJ_DIR})
+target_include_directories(${PROJECT_NAME} PRIVATE ${BACKGROUND_DIR})
+
 
 
 # STB

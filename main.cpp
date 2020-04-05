@@ -25,11 +25,16 @@ unsigned char *bg_image = nullptr;
 int img_width, img_height, img_channels;
 const Point no_intersection(-1, -1, -1);
 RGB *Material::bg_color = new RGB(103, 213, 213);
+std::string obj_path = "obj/";
+std::string background_path = "backgrounds/";
 
 
 void load_bg_img(const std::string &path) {
     stbi_image_free(bg_image);
-    bg_image = stbi_load(("backgrounds/" + path).data(), &img_width, &img_height, &img_channels, 0);
+    bg_image = stbi_load((background_path + path).data(), &img_width, &img_height, &img_channels, 0);
+    if (bg_image == NULL) {
+        bg_image = stbi_load(("../" + background_path + path).data(), &img_width, &img_height, &img_channels, 0);
+    }
     if (bg_image != NULL) {
         bg_map_flag = true;
     }
@@ -242,7 +247,8 @@ void render (const std::vector<Object *> &objects,
 void load_object(const std::string &file_name, const Point &pos, 
                  const Material &m, const int &scale, std::vector<Object *> &arr,
                  const int &x_m = 1, const int &y_m = 1, const int &z_m = 1) {
-    std::ifstream ifs("obj/" + file_name);
+    std::ifstream ifs(obj_path + file_name);
+    if (ifs.bad()) ifs.open("../" + obj_path + file_name);
     std::vector<Point> points;
     points.push_back(Point(0, 0, 0));
     char mode;
@@ -306,7 +312,7 @@ int main (int argc, char **argv) {
 
         w = 1280, h = 720;
 
-        load_bg_img("3palms.jpg");
+        load_bg_img("white_mountains.jpg");
 
         lights.push_back(Light(Point( 1500, -350, -300), 0.5));
         lights.push_back(Light(Point(430, 0, -100), 0.75));
