@@ -418,8 +418,6 @@ int main (int argc, char **argv) {
     // load_object("bust.obj", Point(width/2, height - 100, 200), get_material(MARBLE), 250, objects, -1, -1, -1);
     // load_object("cube.obj", Point(1400, 850, 0), get_material(PLASTIC, GREEN), 100, objects);
     // load_object("Octahedron.obj", Point(1550, 100, 300), get_material(PLASTIC, RED), 400, objects);
-    // load_object("David.obj", Point(width/2, height - 100, 100), get_material(MARBLE), 2, objects);
-    // load_object("Discobolus.obj", Point(width/2 + 50, height - 100, 0), get_material(MARBLE), 10, objects, 1, -1, 1);
 
     printf("Loaded %d objects\n", (int)objects.size());
 
