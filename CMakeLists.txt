@@ -27,19 +27,15 @@ enable_cxx_compiler_flag_if_supported("-O3")
 
 file(GLOB GLOBAL_SOURCES *.h *.cpp)
 file(GLOB SOURCES src/*.cpp stb/*.cpp)
-file(COPY "${OBJ_DIR}/*.obj" DESTINATION "${CMAKE_CURRENT_BINARY_DIR}/obj")
+file(COPY "${OBJ_DIR}" DESTINATION "${CMAKE_CURRENT_BINARY_DIR}")
 message(STATUS "Copied OBJ files")
-file(COPY "${BACKGROUND_DIR}/*.jpg" DESTINATION "${CMAKE_CURRENT_BINARY_DIR}/background")
+file(COPY "${BACKGROUND_DIR}" DESTINATION "${CMAKE_CURRENT_BINARY_DIR}")
 message(STATUS "Copied JPG files")
+file(COPY "${STB_LIB_DIR}" DESTINATION "${CMAKE_CURRENT_BINARY_DIR}")
+message(STATUS "Copied STB libs")
 
 add_executable(${PROJECT_NAME} ${GLOBAL_SOURCES} ${SOURCES} )
 
-target_include_directories(${PROJECT_NAME} PRIVATE ${OBJ_DIR})
-target_include_directories(${PROJECT_NAME} PRIVATE ${BACKGROUND_DIR})
-
-
-# STB
-target_include_directories(${PROJECT_NAME} PRIVATE ${STB_LIB_DIR})
 
 
 add_custom_target(clean-all
