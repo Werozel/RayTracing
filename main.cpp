@@ -297,6 +297,7 @@ int main (int argc, char **argv) {
     std::vector<Polygon> polygons;
     std::vector<Light> lights;
     int w = width, h = height;
+    Point fpos = Point(width/2, height * 1.05, width/2);
 
     switch (scene_number)
     {
@@ -315,7 +316,9 @@ int main (int argc, char **argv) {
         objects.push_back(new Sphere(150, Point(1250, 800, 400), get_material(METAL, BLUE))); // Mirror on the right
         objects.push_back(new Sphere(200, Point(550, 700, 200), get_material(GLASS)));  // Glass under the tree
         
-        objects.push_back(new SceneFloor(Point(950, 950, 0), get_material(PLASTIC, DARK_PINK), WHITE, 200));   // Floor
+        // objects.push_back(new SceneFloor(Point(950, 950, 0), get_material(PLASTIC, DARK_PINK), WHITE, 200));   // Floor
+        objects.push_back(new Rectangle(fpos, get_material(PLASTIC, DARK_PINK), fpos + Point(-1100, 0, -800), fpos + Point(-1100, 0, 1000), fpos + Point(1100, 0, 1000), fpos + Point(1100, 0, -800)));
+
 
         load_object("cube.obj", Point(1400, 850, 0), get_material(PLASTIC, GREEN), 100, objects);
         load_object("Octahedron.obj", Point(1550, 100, 300), get_material(PLASTIC, RED), 400, objects);
@@ -369,7 +372,7 @@ int main (int argc, char **argv) {
 
         objects.push_back(new SceneFloor(Point(950, 950, 0), get_material(PLASTIC, DARK_PINK), LIGHT_BLUE, 200));   // Floor
 
-        load_object("duck.obj", Point(1250, 750, 450), get_material(PLASTIC, ORANGE), 60, objects, 1, -1, 1);
+        load_object("duck.obj", Point(1250, 750, 450), get_material(PLASTIC, YELLOW), 60, objects, 1, -1, 1);
         load_object("Palm_Tree_leaves.obj", Point(250, 950, 150), get_material(PLASTIC, GREEN), 150, objects, 1, -1, 1);
         load_object("Palm_Tree_trunk.obj", Point(250, 950, 150), get_material(PLASTIC, BROWN), 150, objects, 1, -1, 1);
         load_object("bust.obj", Point(width/2 + 150, height - 100, 200), get_material(MARBLE), 250, objects, -1, -1, -1);
