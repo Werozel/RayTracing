@@ -32,9 +32,6 @@ std::string background_path = "backgrounds/";
 void load_bg_img(const std::string &path) {
     stbi_image_free(bg_image);
     bg_image = stbi_load((background_path + path).data(), &img_width, &img_height, &img_channels, 0);
-    if (bg_image == NULL) {
-        bg_image = stbi_load(("../" + background_path + path).data(), &img_width, &img_height, &img_channels, 0);
-    }
     if (bg_image != NULL) {
         bg_map_flag = true;
     }
@@ -248,7 +245,6 @@ void load_object(const std::string &file_name, const Point &pos,
                  const Material &m, const int &scale, std::vector<Object *> &arr,
                  const int &x_m = 1, const int &y_m = 1, const int &z_m = 1) {
     std::ifstream ifs(obj_path + file_name);
-    if (ifs.fail()) ifs.open("../" + obj_path + file_name);
     std::vector<Point> points;
     points.push_back(Point(0, 0, 0));
     char mode;
