@@ -23,6 +23,9 @@ A program that implements ray-tracing rendering technique
 
 ``-smooth n`` - Anti-aliasing value
 
-## Example
-![result](https://user-images.githubusercontent.com/36276118/78260055-2fc64d00-7506-11ea-8747-796f4882d9a2.png)
+## Examples
+
+![scene1](https://user-images.githubusercontent.com/36276118/78508257-0a4b7480-778e-11ea-86d2-f7304aa8a9e1.png)
+![scene2](https://user-images.githubusercontent.com/36276118/78508262-12a3af80-778e-11ea-902a-0ab0844b886c.png)
+![scene3](https://user-images.githubusercontent.com/36276118/78508264-16373680-778e-11ea-81ad-cb47e18019f4.png)
 
