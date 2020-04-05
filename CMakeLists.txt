@@ -4,6 +4,10 @@ project (rt)
 include(CheckCXXCompilerFlag)
 
 set(LIB_DIR "${CMAKE_CURRENT_SOURCE_DIR}")
+set(OBJ_DIR "${LIB_DIR}/obj")
+set(BACKGROUND_DIR "${LIB_DIR}/backgrounds")
+set(STB_LIB_DIR "${LIB_DIR}/stb")
+
 
 function(enable_cxx_compiler_flag_if_supported flag)
 string(FIND "${CMAKE_CXX_FLAGS}" "${flag}" flag_already_set)
@@ -23,17 +27,18 @@ enable_cxx_compiler_flag_if_supported("-O3")
 
 file(GLOB GLOBAL_SOURCES *.h *.cpp)
 file(GLOB SOURCES src/*.cpp stb/*.cpp)
+file(COPY "${OBJ_DIR}/*.obj" DESTINATION "${CMAKE_CURRENT_BINARY_DIR}/obj")
+message(STATUS "Copied OBJ files")
+file(COPY "${BACKGROUND_DIR}/*.jpg" DESTINATION "${CMAKE_CURRENT_BINARY_DIR}/background")
+message(STATUS "Copied JPG files")
 
 add_executable(${PROJECT_NAME} ${GLOBAL_SOURCES} ${SOURCES} )
 
-set(OBJ_DIR "${LIB_DIR}/obj")
-set(BACKGROUND_DIR "${LIB_DIR}/backgrounds")
 target_include_directories(${PROJECT_NAME} PRIVATE ${OBJ_DIR})
 target_include_directories(${PROJECT_NAME} PRIVATE ${BACKGROUND_DIR})
 
 
 # STB
-set(STB_LIB_DIR "${LIB_DIR}/stb")
 target_include_directories(${PROJECT_NAME} PRIVATE ${STB_LIB_DIR})
 
 
