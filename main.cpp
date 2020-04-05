@@ -308,7 +308,6 @@ int main (int argc, char **argv) {
     case 1:
 
         w = 1280, h = 720;
-        smoothness = 2;
 
         // load_bg_img("white_mountains.jpg");
         load_bg_img("underwater.jpg");
