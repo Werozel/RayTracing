@@ -27,7 +27,7 @@ file(GLOB SOURCES src/*.cpp stb/*.cpp)
 add_executable(${PROJECT_NAME} ${GLOBAL_SOURCES} ${SOURCES} )
 
 set(OBJ_DIR "${LIB_DIR}/obj")
-set(BACKGROUND_DIR "${LIB_DIR}/background")
+set(BACKGROUND_DIR "${LIB_DIR}/backgrounds")
 target_include_directories(${PROJECT_NAME} PRIVATE 
    OBJ_DIR
    BACKGROUND_DIR
