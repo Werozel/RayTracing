@@ -160,7 +160,7 @@ RGB cast_ray(const Ray &ray, const std::vector<Object *> &objects,
             Ray refraction_ray(refract_start, refract_dir.normalize());
 
             // Casting refraction ray
-            refraction_result = cast_ray(refraction_ray, objects, lights, depth + 1) * 0.9;
+            refraction_result = cast_ray(refraction_ray, objects, lights, depth + 1);
         } else {
             reflection_result = reflection_result * 0.9;
         }
@@ -308,26 +308,36 @@ int main (int argc, char **argv) {
     switch (scene_number)
     {
         // Basic scene
+        // Bubbles underwater
     case 1:
 
         w = 1280, h = 720;
+        smoothness = 2;
 
-        load_bg_img("white_mountains.jpg");
+        // load_bg_img("white_mountains.jpg");
+        load_bg_img("underwater.jpg");
 
         lights.push_back(Light(Point( 1500, -350, -300), 0.5));
-        lights.push_back(Light(Point(430, 0, -100), 0.75));
-        lights.push_back(Light(Point(1000, 550, -400), 0.4));
+        lights.push_back(Light(Point(430, 0, -100), 0.4));
+        lights.push_back(Light(Point(1000, 550, -400), 0.75));
 
-        objects.push_back(new Sphere(300, Point(150, 540, 700), get_material(PLASTIC, BLUE)));    // Blue under the tree
-        objects.push_back(new Sphere(150, Point(1250, 800, 400), get_material(METAL, BLUE))); // Mirror on the right
+        objects.push_back(new Sphere(300, Point(150, 540, 700), get_material(METAL, BLUE)));    // Blue under the tree
+        objects.push_back(new Sphere(150, Point(1250, 800, 200), get_material(GLASS, BLUE))); // Mirror on the right
         objects.push_back(new Sphere(200, Point(550, 700, 200), get_material(GLASS)));  // Glass under the tree
-        
+        objects.push_back(new Sphere(50, Point(1550, 100, 300), get_material(METAL)));
+        objects.push_back(new Sphere(80, Point(1550, 900, 700), get_material(PLASTIC, BLUE)));
+        objects.push_back(new Sphere(50, Point(100, 300, 400), get_material(PLASTIC, LIGHT_BLUE)));
+        objects.push_back(new Sphere(150, Point(960, 100, 300), get_material(METAL)));
+        objects.push_back(new Sphere(80, Point(1300, 300, 200), get_material(PLASTIC, LIGHT_BLUE)));
+
+
+
         // objects.push_back(new SceneFloor(Point(950, 950, 0), get_material(PLASTIC, DARK_PINK), WHITE, 200));   // Floor
-        objects.push_back(new Rectangle(fpos, get_material(PLASTIC, DARK_PINK), fpos + Point(-1100, 0, -800), fpos + Point(-1100, 0, 1000), fpos + Point(1100, 0, 1000), fpos + Point(1100, 0, -800)));
+        // objects.push_back(new Rectangle(fpos, get_material(PLASTIC, DARK_PINK), fpos + Point(-1100, 0, -800), fpos + Point(-1100, 0, 1000), fpos + Point(1100, 0, 1000), fpos + Point(1100, 0, -800)));
 
 
-        load_object("cube.obj", Point(1400, 850, 0), get_material(PLASTIC, GREEN), 100, objects);
-        load_object("Octahedron.obj", Point(1550, 100, 300), get_material(PLASTIC, RED), 400, objects);
+        // load_object("cube.obj", Point(1400, 850, 0), get_material(PLASTIC, WHITE), 100, objects);
+        // load_object("Octahedron.obj", Point(1550, 100, 300), get_material(PLASTIC, RED), 400, objects);
         
         break;
 
@@ -350,11 +360,13 @@ int main (int argc, char **argv) {
         objects.push_back(new Sphere(300, Point(150, 540, 700), get_material(PLASTIC, BLUE)));    // Blue under the tree
         objects.push_back(new Sphere(150, Point(1250, 800, 400), get_material(METAL, BLUE))); // Mirror on the right
         objects.push_back(new Sphere(200, Point(550, 700, 200), get_material(GLASS)));  // Glass under the tree
-        objects.push_back(new Sphere(300, Point(1550, 100, 300), get_material(PLASTIC, RED))); // Red in the air
 
-        objects.push_back(new SceneFloor(Point(950, 950, 0), get_material(PLASTIC, ORANGE), PINK, 200));   // Floor
+        // objects.push_back(new SceneFloor(Point(950, 950, 0), get_material(PLASTIC, ORANGE), PINK, 200));   // Floor
+        objects.push_back(new Rectangle(fpos, get_material(PLASTIC, ORANGE), fpos + Point(-1100, 0, -800), fpos + Point(-1100, 0, 1000), fpos + Point(1100, 0, 1000), fpos + Point(1100, 0, -800)));
+
 
         load_object("duck.obj", Point(1250, 750, 450), get_material(PLASTIC, GREEN), 60, objects, 1, -1, 1);
+        load_object("Octahedron.obj", Point(1550, 100, 300), get_material(PLASTIC, RED), 400, objects);
 
         break;
 
