@@ -52,7 +52,7 @@ class Triplet {
         Triplet operator* (const float &n) const;
         Triplet operator/ (const float &n) const;
         friend Triplet operator* (const float &n, const Triplet &t) 
-            {return Triplet(n * t.get_x(), n * t.get_y(), n * t.get_z());}
+            { return Triplet {n * t.get_x(), n * t.get_y(), n * t.get_z() }; }
 };
 
 class Vector: public Triplet {
