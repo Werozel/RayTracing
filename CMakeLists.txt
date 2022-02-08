@@ -34,7 +34,7 @@ message(STATUS "Copied JPG files")
 file(COPY "${STB_LIB_DIR}" DESTINATION "${CMAKE_CURRENT_BINARY_DIR}")
 message(STATUS "Copied STB libs")
 
-add_executable(${PROJECT_NAME} ${GLOBAL_SOURCES} ${SOURCES} )
+add_executable(${PROJECT_NAME} ${GLOBAL_SOURCES} ${SOURCES})
 
 
 

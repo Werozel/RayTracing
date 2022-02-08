@@ -4,45 +4,57 @@
 #include <cmath>
 
 
-Object::Object(const Point &pos, const Material &m)
-    {position = new Point(pos);  material = new Material(m);}
+Object::Object(const Point &pos, const Material &m) {
+    position = new Point(pos);
+    material = new Material(m);
+}
 
-Point & Object::get_position() const { return *position;}
-Material & Object::get_material() const { return *material;}
-RGB Object::get_color(const Point &p) const { return material->get_obj_color();}
-SurfaceType Object::get_stype() const { return material->get_surface_type();}
-float Object::get_deffuse_coef() const { return material->get_deffuse_coef();}
-float Object::get_mirror_coef() const { return material->get_mirror_coef();}
-float Object::get_shininess() const { return material->get_shininess();}
-float Object::get_refractive_index() const { return material->get_refractive_index();}
+Point &Object::get_position() const { return *position; }
 
-Object::~Object () {delete position; delete material;}
+Material &Object::get_material() const { return *material; }
+
+RGB Object::get_color(const Point &p) const { return material->get_obj_color(); }
+
+SurfaceType Object::get_stype() const { return material->get_surface_type(); }
+
+float Object::get_deffuse_coef() const { return material->get_deffuse_coef(); }
+
+float Object::get_mirror_coef() const { return material->get_mirror_coef(); }
+
+float Object::get_shininess() const { return material->get_shininess(); }
+
+float Object::get_refractive_index() const { return material->get_refractive_index(); }
+
+Object::~Object() {
+    delete position;
+    delete material;
+}
 
 Point Object::ray_intersection(const Ray &ray) const {
-    return Point(0, 0, 0);
+    return Point{0, 0, 0};
 }
 
 Vector Object::get_norm(const Point &p) const {
-    return Vector(0, 0, 0);
+    return Vector{0, 0, 0};
 }
 
 
-
 // --------------------- Sphere --------------------------
-Sphere::Sphere (const Sphere &s): 
-    Object(s.get_position(), s.get_material()), 
-    radius(s.get_radius()) {}
+Sphere::Sphere(const Sphere &s) :
+        Object(s.get_position(), s.get_material()),
+        radius(s.get_radius()) {}
 
-void Sphere::operator= (const Sphere &s) {
-    if (&s == this) { return;}
+Sphere &Sphere::operator=(const Sphere &s) {
+    if (&s == this) { return *this; }
     delete position;
     delete material;
     position = new Point(s.get_position());
     material = new Material(s.get_material());
     radius = s.get_radius();
+    return *this;
 }
 
-float Sphere::get_radius () const { return radius;}
+float Sphere::get_radius() const { return radius; }
 
 Point Sphere::ray_intersection(const Ray &ray) const {
     Point p = ray.get_closest_point_to_object(*this);
@@ -51,10 +63,10 @@ Point Sphere::ray_intersection(const Ray &ray) const {
     if (dist <= radius) {
         Vector v = Vector(p, *ray.start).normalize();
         if (is_inside) v = -v;
-        float half_horde = sqrt(radius * radius - dist * dist);
+        float half_horde = std::sqrt(radius * radius - dist * dist);
         return p + v * half_horde;
     } else {
-        return Point(-1, -1, -1);
+        return Point{-1, -1, -1};
     }
 }
 
@@ -62,44 +74,37 @@ Vector Sphere::get_norm(const Point &p) const {
     return Vector(*position, p).normalize();
 }
 
-Sphere::~Sphere() {
-}
+Sphere::~Sphere() = default;
 
 
 // ----------------------- Polygon ---------------------------
-Polygon::Polygon (const Point &pos, const Material &m, const Point &p1_t, 
-                  const Point &p2_t, const Point &p3_t):
-    Object(pos, m) {
-        p1 = new Point(p1_t);
-        p2 = new Point(p2_t);
-        p3 = new Point(p3_t);
-        norm = new Vector(cross_prod(Vector(pos, *p2), Vector(pos, *p1)).normalize());
-    }
-
-Polygon::Polygon (const Polygon &p): Object(p.get_position(), p.get_material()) {
-        p1 = new Point(p.get_p1());
-        p2 = new Point(p.get_p2());
-        p3 = new Point(p.get_p3());
-        norm = new Vector(p.get_polygon_norm());
-    }
-
-void Polygon::set_norm(const Vector &n) {
-    if (&n == this->norm) { return;}
-    delete norm;
-    norm = new Vector(n);
+Polygon::Polygon(const Point &pos, const Material &m, const Point &p1_t,
+                 const Point &p2_t, const Point &p3_t) :
+        Object(pos, m) {
+    p1 = new Point(p1_t);
+    p2 = new Point(p2_t);
+    p3 = new Point(p3_t);
+    norm = new Vector(cross_prod(Vector(pos, *p2), Vector(pos, *p1)).normalize());
 }
 
-Vector Polygon::get_v1() const { return Vector(*position, *p1);}
-Vector Polygon::get_v2() const { return Vector(*position, *p2);}
-Vector Polygon::get_v3() const { return Vector(*position, *p3);}
-Point & Polygon::get_p1() const { return *p1;}
-Point & Polygon::get_p2() const { return *p2;}
-Point & Polygon::get_p3() const { return *p3;}
-Vector & Polygon::get_polygon_norm() const { return *norm;}
+Polygon::Polygon(const Polygon &p) : Object(p.get_position(), p.get_material()) {
+    p1 = new Point(p.get_p1());
+    p2 = new Point(p.get_p2());
+    p3 = new Point(p.get_p3());
+    norm = new Vector(p.get_polygon_norm());
+}
+
+Point &Polygon::get_p1() const { return *p1; }
+
+Point &Polygon::get_p2() const { return *p2; }
+
+Point &Polygon::get_p3() const { return *p3; }
+
+Vector &Polygon::get_polygon_norm() const { return *norm; }
 
 
-void Polygon::operator= (const Polygon &p) {
-    if (&p == this) { return;}
+Polygon &Polygon::operator=(const Polygon &p) {
+    if (&p == this) { return *this; }
     delete position;
     delete material;
     delete norm;
@@ -112,6 +117,7 @@ void Polygon::operator= (const Polygon &p) {
     p1 = new Point(p.get_p1());
     p2 = new Point(p.get_p2());
     p3 = new Point(p.get_p3());
+    return *this;
 }
 
 Point Polygon::ray_intersection(const Ray &ray) const {
@@ -126,12 +132,12 @@ Point Polygon::ray_intersection(const Ray &ray) const {
     float u = P * T / z;
     float v = Q * ray.get_direction() / z;
     float k = 1 - u - v;
-    
+
     if (k >= 0 && u >= 0 && v >= 0 && t > 0) {
         // return Point(k * *p2 + u * *p3 + v * *p1);
-        return Point(ray.get_start() + t * ray.get_direction());
+        return Point{ray.get_start() + t * ray.get_direction()};
     } else {
-        return Point(-1, -1, -1);
+        return Point{-1, -1, -1};
     }
 }
 
@@ -149,23 +155,27 @@ Polygon::~Polygon() {
 
 // ----------------------- Rectangle -------------------------
 
-Rectangle::Rectangle(const Point &pos, const Material &m, 
-                     const Point &p1_t, const Point &p2_t, 
-                     const Point &p3_t, const Point p4_t):
-        Object(pos, m), p1(Polygon(pos, m, p1_t, p2_t, p3_t)), 
+Rectangle::Rectangle(const Point &pos,
+                     const Material &m,
+                     const Point &p1_t,
+                     const Point &p2_t,
+                     const Point &p3_t,
+                     const Point p4_t) :
+        Object(pos, m), p1(Polygon(pos, m, p1_t, p2_t, p3_t)),
         p2(Polygon(pos, m, p3_t, p4_t, p1_t)) {}
 
-Rectangle::Rectangle(const Rectangle &r):
-    Object(r.get_position(), r.get_material()), p1(r.p1), p2(r.p2) {}
+Rectangle::Rectangle(const Rectangle &r) :
+        Object(r.get_position(), r.get_material()), p1(r.p1), p2(r.p2) {}
 
-void Rectangle::operator= (const Rectangle &r) {
-    if (&r == this) { return;}
+Rectangle &Rectangle::operator=(const Rectangle &r) {
+    if (&r == this) { return *this; }
     delete position;
     delete material;
     position = new Point(r.get_position());
     material = new Material(r.get_material());
     p1 = r.p1;
     p2 = r.p2;
+    return *this;
 }
 
 Point Rectangle::ray_intersection(const Ray &ray) const {
@@ -176,22 +186,23 @@ Point Rectangle::ray_intersection(const Ray &ray) const {
     return res;
 }
 
-Vector Rectangle::get_norm (const Point &p) const {
+Vector Rectangle::get_norm(const Point &p) const {
     return p1.get_polygon_norm();
 }
 
 // ------------------------ Floor ---------------------------
 
-SceneFloor::SceneFloor(const Point &pos, const Material &m, const Colors &s_col, const float &pal_size): 
-    Object(pos, m),
-    second_color(new RGB((s_col == BG_COLOR) ? m.get_obj_color() : get_material_color(s_col))),
-    tile_size(pal_size) {}
+SceneFloor::SceneFloor(const Point &pos, const Material &m, const Colors &s_col, const float &pal_size) :
+        Object(pos, m),
+        second_color(new RGB((s_col == BG_COLOR) ? m.get_obj_color() : get_material_color(s_col))),
+        tile_size(pal_size) {}
 
-SceneFloor::SceneFloor(const SceneFloor &f): Object(f.get_position(), f.get_material()),
-    second_color(new RGB(f.get_second_color())), tile_size(f.get_tile_size()) {}
+SceneFloor::SceneFloor(const SceneFloor &f) : Object(f.get_position(), f.get_material()),
+                                              second_color(new RGB(f.get_second_color())),
+                                              tile_size(f.get_tile_size()) {}
 
-void SceneFloor::operator= (const SceneFloor &f) {
-    if (&f == this) { return;}
+SceneFloor &SceneFloor::operator=(const SceneFloor &f) {
+    if (&f == this) { return *this; }
     delete position;
     delete material;
     delete second_color;
@@ -199,11 +210,13 @@ void SceneFloor::operator= (const SceneFloor &f) {
     material = new Material(f.get_material());
     second_color = new RGB(f.get_second_color());
     tile_size = f.get_tile_size();
+    return *this;
 }
 
 RGB SceneFloor::get_second_color() const {
     return *second_color;
 }
+
 float SceneFloor::get_tile_size() const {
     return tile_size;
 }
@@ -217,16 +230,16 @@ Point SceneFloor::ray_intersection(const Ray &ray) const {
 
     float z = P * E1;
     float t = Q * E2 / z;
-    
-    if ( t > 0) {
-        return Point(ray.get_start() + t * ray.get_direction());
+
+    if (t > 0) {
+        return Point{ray.get_start() + t * ray.get_direction()};
     } else {
-        return Point(-1, -1, -1);
-    } 
+        return Point{-1, -1, -1};
+    }
 }
 
 Vector SceneFloor::get_norm(const Point &p) const {
-    return Vector(0, -1, 0);
+    return Vector{0, -1, 0};
 }
 
 RGB SceneFloor::get_color(const Point &p) const {
@@ -239,24 +252,28 @@ RGB SceneFloor::get_color(const Point &p) const {
     }
 }
 
-SceneFloor::~SceneFloor() { delete second_color;}
-
+SceneFloor::~SceneFloor() { delete second_color; }
 
 
 // ----------------------- Ray -------------------------------
-Ray::Ray(): start(nullptr), direction(nullptr) {}
-Ray::Ray(const Point &start_point, const Vector &dir) 
-    {start = new Point(start_point); direction = new Vector(dir.normalize());}
+Ray::Ray() : start(nullptr), direction(nullptr) {}
 
-Point & Ray::get_start() const { return *start;}
-Vector & Ray::get_direction() const { return *direction;}
+Ray::Ray(const Point &start_point, const Vector &dir) {
+    start = new Point(start_point);
+    direction = new Vector(dir.normalize());
+}
 
-void Ray::operator= (const Ray &r) {
-    if (&r == this) { return;}
+Point &Ray::get_start() const { return *start; }
+
+Vector &Ray::get_direction() const { return *direction; }
+
+Ray &Ray::operator=(const Ray &r) {
+    if (&r == this) { return *this; }
     delete start;
     delete direction;
     start = new Point(r.get_start());
     direction = new Vector(r.get_direction());
+    return *this;
 }
 
 Point Ray::get_closest_point_to_point(const Point &p) const {
@@ -264,19 +281,19 @@ Point Ray::get_closest_point_to_point(const Point &p) const {
     float cos = v * *direction / v.get_length() / direction->get_length();
     if (cos <= 0) {
         v = -v;
-    } 
+    }
     Point t = *start;
-    float k = (v * direction->normalize())/ direction->get_length();
-    Vector shift = k * direction->normalize();
+    float k = (v * direction->normalize()) / direction->get_length();
+    Vector shift = Vector{k * direction->normalize()};
     t = t + shift;
     return t;
 }
 
-Point Ray::get_closest_point_to_object (const Object &o) const {
+Point Ray::get_closest_point_to_object(const Object &o) const {
     return get_closest_point_to_point(o.get_position());
 }
 
-Ray::~Ray () {
+Ray::~Ray() {
     delete start;
     delete direction;
 }

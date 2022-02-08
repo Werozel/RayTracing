@@ -4,33 +4,37 @@
 #include <string>
 
 enum Colors {
-    BG_COLOR, 
-    WHITE, 
+    BG_COLOR,
+    WHITE,
     BLACK,
-    GRAY, 
+    GRAY,
     RED,
     GREEN,
-    BLUE, 
+    BLUE,
     LIGHT_BLUE,
     PURPLE,
     DARK_PURPLE,
     YELLOW,
     ORANGE,
-    BROWN, 
+    BROWN,
     PINK,
     DARK_PINK
 };
 
 enum Materials {
-    GLASS, 
-    METAL, 
+    GLASS,
+    METAL,
     PLASTIC,
-    COLORED_METAL, 
+    COLORED_METAL,
     MARBLE
 };
 
-enum SurfaceType { OPAQUE, MIRROR, TRANSPARENT, COLORED_MIRROR};
-enum IntersectionType { ABSORPTION, REFLECTION, REFLECTION_AND_REFRACTION};
+enum SurfaceType {
+    OPAQUE, MIRROR, TRANSPARENT, COLORED_MIRROR
+};
+enum IntersectionType {
+    ABSORPTION, REFLECTION, REFLECTION_AND_REFRACTION
+};
 
 
 const int width = 1920;
