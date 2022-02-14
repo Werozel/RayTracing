@@ -87,7 +87,7 @@ public:
     Point *p3;
 
     Polygon(const Point &pos, const Material &m,
-            const Point &p1, const Point &p2, const Point &p3);
+            const Point &p1, const Point &p2, const Point &p3, const bool invert_norm);
 
     Polygon(const Polygon &p);
 
@@ -119,7 +119,8 @@ public:
               const Point &p1_t,
               const Point &p2_t,
               const Point &p3_t,
-              const Point p4_t);
+              const Point p4_t,
+              const bool invert_norm = false);
 
     Rectangle(const Rectangle &r);
 

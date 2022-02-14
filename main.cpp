@@ -19,7 +19,7 @@
 
 char *output_file = new char[100];
 int threads_num = 32;
-int scene_number = 3;
+int scene_number = 1;
 int smoothness = 2;
 static bool bg_map_flag = false;
 unsigned char *bg_image = nullptr;
@@ -244,6 +244,7 @@ void load_object(const std::string &file_name,
                  const Material &m,
                  const float &scale,
                  std::vector<Object *> &arr,
+                 const bool invert_norm = false,
                  const float &x_m = 1,
                  const float &y_m = 1,
                  const float &z_m = 1) {
@@ -268,10 +269,10 @@ void load_object(const std::string &file_name,
             ifs >> indexes[3];
             Point p4 = points[indexes[3]];
             Point poly_center = Point{(p1 + p2 + p3 + p4) / 4};
-            arr.push_back(new Rectangle(poly_center, m, p1, p2, p3, p4));
+            arr.push_back(new Rectangle(poly_center, m, p1, p2, p3, p4, invert_norm));
         } else {
             Point poly_center = Point{(p1 + p2 + p3) / 3};
-            arr.push_back(new Polygon(poly_center, m, p1, p2, p3));
+            arr.push_back(new Polygon(poly_center, m, p1, p2, p3, invert_norm));
         }
         while (ifs >> mode && mode != 'f');
     }
@@ -303,6 +304,8 @@ int main(int argc, char **argv) {
     int w = width, h = height;
     Point fpos = Point((float) width / 2, (float) height * 1.05, (float) width / 2);
 
+    std::cout << "Loading..." << std::endl;
+
     switch (scene_number) {
         // Basic scene
         // Bubbles underwater
@@ -316,6 +319,7 @@ int main(int argc, char **argv) {
             lights.emplace_back(Point(1500, -350, -300), 0.5);
             lights.emplace_back(Light(Point(430, 0, -100), 0.4));
             lights.emplace_back(Light(Point(1000, 550, -400), 0.75));
+//            lights.emplace_back(Light(Point(1300, 300, 100), 1));
 
             objects.emplace_back(
                     new Sphere(300, Point(150, 540, 700), get_material(METAL, BLUE)));    // Blue under the tree
@@ -325,14 +329,13 @@ int main(int argc, char **argv) {
             objects.emplace_back(new Sphere(50, Point(1550, 100, 300), get_material(METAL)));
             objects.emplace_back(new Sphere(80, Point(1550, 900, 700), get_material(PLASTIC, BLUE)));
             objects.emplace_back(new Sphere(50, Point(100, 300, 400), get_material(PLASTIC, LIGHT_BLUE)));
-            objects.emplace_back(new Sphere(150, Point(960, 100, 300), get_material(METAL)));
-            objects.emplace_back(new Sphere(80, Point(1300, 300, 200), get_material(PLASTIC, LIGHT_BLUE)));
+            objects.emplace_back(new Sphere(150, Point(960, 300, 100), get_material(METAL)));
+//            objects.emplace_back(new Sphere(80, Point(1300, 300, 200), get_material(PLASTIC, LIGHT_BLUE)));
 
-
+            load_object("skull_1Casted.obj", Point(1300, 300, 100), get_material(PLASTIC, RED), 1, objects, true);
 
             // objects.push_back(new SceneFloor(Point(950, 950, 0), get_material(PLASTIC, DARK_PINK), WHITE, 200));   // Floor
             // objects.push_back(new Rectangle(fpos, get_material(PLASTIC, DARK_PINK), fpos + Point(-1100, 0, -800), fpos + Point(-1100, 0, 1000), fpos + Point(1100, 0, 1000), fpos + Point(1100, 0, -800)));
-
 
             // load_object("cube.obj", Point(1400, 850, 0), get_material(PLASTIC, WHITE), 100, objects);
             // load_object("Octahedron.obj", Point(1550, 100, 300), get_material(PLASTIC, RED), 400, objects);
@@ -369,13 +372,14 @@ int main(int argc, char **argv) {
                         fpos + Point(-1100, 0, -800),
                         fpos + Point(-1100, 0, 1000),
                         fpos + Point(1100, 0, 1000),
-                        fpos + Point(1100, 0, -800)
+                        fpos + Point(1100, 0, -800),
+                        false
                 )
             );
 
 
             load_object("duck.obj", Point(1250, 750, 450), get_material(PLASTIC, GREEN), 60, objects, 1, -1, 1);
-            load_object("Octahedron.obj", Point(1550, 100, 300), get_material(PLASTIC, RED), 400, objects);
+            load_object("skull_1Casted.obj", Point(1550, 100, 300), get_material(PLASTIC, RED), 400, objects);
 
             break;
 

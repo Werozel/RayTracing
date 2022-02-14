@@ -23,11 +23,11 @@ float get_angle_sin(const float &cos) {
     return std::sqrt(1 - cos * cos);
 }
 
-Vector cross_prod(const Vector &v1, const Vector &v2) {
+Vector cross_prod(const Vector &v1, const Vector &v2, const bool invert_norm) {
     float x1 = v1.get_x(), x2 = v2.get_x();
     float y1 = v1.get_y(), y2 = v2.get_y();
     float z1 = v1.get_z(), z2 = v2.get_z();
-    return Vector{y1 * z2 - z1 * y2, z1 * x2 - x1 * z2, x1 * y2 - y1 * x2};
+    return -1 * Vector{y1 * z2 - z1 * y2, z1 * x2 - x1 * z2, x1 * y2 - y1 * x2};
 }
 
 

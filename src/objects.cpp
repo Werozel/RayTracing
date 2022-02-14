@@ -79,7 +79,7 @@ Sphere::~Sphere() = default;
 
 // ----------------------- Polygon ---------------------------
 Polygon::Polygon(const Point &pos, const Material &m, const Point &p1_t,
-                 const Point &p2_t, const Point &p3_t) :
+                 const Point &p2_t, const Point &p3_t, const bool invert_norm) :
         Object(pos, m) {
     p1 = new Point(p1_t);
     p2 = new Point(p2_t);
@@ -160,9 +160,10 @@ Rectangle::Rectangle(const Point &pos,
                      const Point &p1_t,
                      const Point &p2_t,
                      const Point &p3_t,
-                     const Point p4_t) :
-        Object(pos, m), p1(Polygon(pos, m, p1_t, p2_t, p3_t)),
-        p2(Polygon(pos, m, p3_t, p4_t, p1_t)) {}
+                     const Point p4_t,
+                     const bool invert_norm) :
+        Object(pos, m), p1(Polygon(pos, m, p1_t, p2_t, p3_t, invert_norm)),
+        p2(Polygon(pos, m, p3_t, p4_t, p1_t, invert_norm)) {}
 
 Rectangle::Rectangle(const Rectangle &r) :
         Object(r.get_position(), r.get_material()), p1(r.p1), p2(r.p2) {}

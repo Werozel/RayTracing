@@ -35,7 +35,7 @@ float get_angle_sin(const Vector &v1, const Vector &v2);
 float get_angle_sin(const float &cos);
 
 // Calculates cross product of vectors
-Vector cross_prod(const Vector &v1, const Vector &v2);
+Vector cross_prod(const Vector &v1, const Vector &v2, bool invert_norm = false);
 
 
 class Triplet {
@@ -94,6 +94,10 @@ public:
 
     // Returns a normilized current vector
     [[nodiscard]] Vector normalize() const;
+
+    friend Vector operator*(const float &n, const Vector &t) {
+        return Vector{n * t.get_x(), n * t.get_y(), n * t.get_z()};
+    }
 };
 
 class Point : public Triplet {
